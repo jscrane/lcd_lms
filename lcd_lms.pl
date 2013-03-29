@@ -301,6 +301,7 @@ sub clear_track {
 	set_status "stop";
 	$total_tracks = 0;
 	$current_track = 0;
+	$playing = 0;
 	set_progress;
 }
 
@@ -343,7 +344,7 @@ sub playlist {
 sub mixer {
 	my $cmd = shift;
 	switch ($cmd) {
-	case "volume"	{ set_volume shift; }
+	case "volume"	{ set_volume uri_unescape(shift); }
 	else		{ print "mixer: $cmd\n"; }
 	}
 }
@@ -363,11 +364,20 @@ sub mode {
 	}
 }
 
+sub prefset {
+	my $cmd = shift;
+	switch ($cmd) {
+	case "server"	{ if (shift eq "volume") { set_volume shift; } }
+	else		{ print "prefset: $cmd\n"; }
+	}
+}
+
 sub lms_response {
 	my $r = shift;
 	my @s = split(/ /, $r);
 	switch ($s[0]) {
 	case "playlist" { shift @s; playlist @s; }
+	case "prefset" 	{ shift @s; prefset @s; }
 	case "mixer" 	{ shift @s; mixer @s; }
 	case "mode" 	{ shift @s; mode @s; }
 	case "time"	{ $elapsed_time = $s[1]; set_time; }
