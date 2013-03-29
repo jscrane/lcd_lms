@@ -44,19 +44,15 @@ sub send_receive;
 sub lms_query;
 sub lms_send;
 sub lms_response;
-sub set_status;
-sub playlist;
-sub mixer;
 
-## main routine ##
 my %opt = ();
+getopts("s:p:S:P:n:", \%opt);
 
-# set variables
-#$LCDD = defined($opt{s}) ? $opt{s} : $LCDD;
-#$LCDPORT = defined($opt{p}) ? $opt{p} : $LCDPORT;
-#$LMS = defined($opt{m}) ? $opt{m} : $LMS;
-#$LMSPORT = defined($opt{P}) ? $opt{P} : $LMSPORT;
-#$PLAYER = defined($opt{n}) ? $opt{n} : $PLAYER;
+$LCDD = defined($opt{s}) ? $opt{s} : $LCDD;
+$LCDPORT = defined($opt{p}) ? $opt{p} : $LCDPORT;
+$LMS = defined($opt{m}) ? $opt{m} : $LMS;
+$LMSPORT = defined($opt{P}) ? $opt{P} : $LMSPORT;
+$PLAYER = defined($opt{n}) ? $opt{n} : $PLAYER;
 
 # Connect to the servers...
 my $lms = IO::Socket::INET->new(
@@ -230,14 +226,16 @@ sub set_album {
 	$album = shift;
 	# if album is undefined (as it is for radio streams) give
 	# its field to part of the name of the stream.
-	if (!defined($album) && length($title) > $width) {
+	if (!defined $album) {
+		$album = "";
+	} elsif ($album ne "") {
+		$album = centre($width, $album);
+	} elsif (length($title) > $width) {
 		my $pos = rindex($title, ' ', $width);
 		if ($pos > 0) {
 			$album = centre($width, substr($title, $pos + 1));
 			set_title substr($title, 0, $pos);
 		}
-	} else {
-		$album = centre($width, $album);
 	}
 	send_receive $lcd, "widget_set $PLAYER album 1 2 $width 2 v 8 \"$album\"";
 }
