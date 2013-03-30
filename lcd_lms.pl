@@ -226,9 +226,8 @@ sub set_album {
 	$album = shift;
 	# if album is undefined (as it is for radio streams) give
 	# its field to part of the name of the stream.
-	if (!defined $album) {
-		$album = "";
-	} elsif ($album ne "") {
+	$album = "" if (!defined $album);
+	if ($album ne "") {
 		$album = centre($width, $album);
 	} elsif (length($title) > $width) {
 		my $pos = rindex($title, ' ', $width);
