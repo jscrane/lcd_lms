@@ -308,7 +308,7 @@ sub playlist {
 	my $cmd = shift;
 	switch ($cmd) {
 	case "clear"		{ clear_track; }
-	case "stop"		{ set_status $cmd; }
+	case "stop"		{ $playing = 0; set_status $cmd; }
 	case "pause"		{ lms_send "mode"; }
 	case "title"		{ shift; set_title uri_unescape(shift); }
 	case "album"		{ shift; set_album uri_unescape(shift); }
