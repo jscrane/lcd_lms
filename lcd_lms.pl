@@ -335,6 +335,7 @@ sub playlist {
 		lms_send "playlist artist $id";
 		lms_send "playlist duration $id";
 		$elapsed_time = 0;
+		$playing = 1;
 	}
 	else			{ print "playlist: $cmd\n"; }
 	}
