@@ -218,7 +218,9 @@ sub centre {
 }
 
 sub set_title {
-	$title = centre($width, shift);
+	$title = shift;
+	$title = "" if (!defined $title);
+	$title = centre($width, $title);
 	send_receive $lcd, "widget_set $PLAYER title 1 1 $width 1 v 8 \"$title\"";
 }
 
@@ -241,6 +243,7 @@ sub set_album {
 
 sub set_artist {
 	$artist = shift;
+	$artist = "" if (!defined $artist);
 	my $n = length($artist);
 	# if artist and album are the same, and too long for the display,
 	# break them up nicely
@@ -257,12 +260,15 @@ sub set_artist {
 
 sub set_status {
 	$state = centre(10, shift);
-	send_receive $lcd, "widget_set $PLAYER status 5 4 \"$state\"";
+	send_receive $lcd, "widget_set $PLAYER status 6 4 \"$state\"";
 }
 
 sub set_progress {
-	my $p = sprintf "%d/%d", $current_track, $total_tracks;
-	$p = sprintf "% 6s", $p;
+	my $p = "";
+	if ($total_tracks > 0) {
+		my $p = sprintf "%d/%d", $current_track, $total_tracks;
+		$p = sprintf "% 6s", $p;
+	}
 	send_receive $lcd, "widget_set $PLAYER progress 15 4 \"$p\"";
 }
 
@@ -329,11 +335,13 @@ sub playlist {
 	case "newsong"		{ 
 		set_title uri_unescape(shift);
 		my $id = shift;
-		$current_track = $id + 1; 
+		if (defined $id) { 
+			$current_track = $id + 1; 
+			lms_send "playlist album $id";
+			lms_send "playlist artist $id";
+			lms_send "playlist duration $id";
+		}
 		set_progress;
-		lms_send "playlist album $id";
-		lms_send "playlist artist $id";
-		lms_send "playlist duration $id";
 		$elapsed_time = 0;
 		$playing = 1;
 	}
