@@ -6,7 +6,6 @@ use Getopt::Std;
 use IO::Socket;
 use IO::Select;
 use Fcntl;
-use POSIX qw(strftime ceil);
 use Date::Parse;
 use Switch;
 use URI::Escape;
