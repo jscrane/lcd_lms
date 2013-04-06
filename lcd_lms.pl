@@ -130,6 +130,11 @@ while () {
 	while (@ready = $sel->can_read(1)) {
 		foreach $fh (@ready) {
 			my $input = <$fh>;
+			if (!defined $input) {
+				close ($lcd);
+				close ($lms);
+				exit;
+			}
 			if ( $fh == $lms && $input =~ /$player_id (.+)/ ) {
 				lms_response $1;
 			}
@@ -140,10 +145,6 @@ while () {
 		set_time();
 	}
 }
-
-
-close ($lcd)  or  error(1, "close() failed");
-exit;
 
 ## print out error message and eventually exit ##
 # Synopsis:  error($status, $message)
@@ -266,7 +267,7 @@ sub set_status {
 sub set_progress {
 	my $p = "";
 	if ($total_tracks > 0) {
-		my $p = sprintf "%d/%d", $current_track, $total_tracks;
+		$p = sprintf "%d/%d", $current_track, $total_tracks;
 		$p = sprintf "% 6s", $p;
 	}
 	send_receive $lcd, "widget_set $PLAYER progress 15 4 \"$p\"";
@@ -320,10 +321,11 @@ sub playlist {
 	case "album"		{ shift; set_album uri_unescape(shift); }
 	case "artist"		{ shift; set_artist uri_unescape(shift); }
 	case "duration"		{ shift; $current_duration = shift; set_time; }
-	case "tracks"		{ $total_tracks = shift; }
+	case "tracks"		{ $total_tracks = int(shift); }
 	case "loadtracks"	{ lms_send "playlist tracks"; }
+	case "addtracks"	{ lms_send "playlist tracks"; }
 	case "index"		{ 
-		my $id = shift;
+		my $id = int(shift);
 		$current_track = $id + 1; 
 		set_progress;
 		lms_send "playlist title $id";
