@@ -101,7 +101,7 @@ if ($lcdresponse =~ /\bhgt\s+(\d+)\b/) {
 
 send_receive $lcd, "client_set name {$progname}";
 send_receive $lcd, "screen_add $PLAYER";
-send_receive $lcd, "screen_set $PLAYER name playback heartbeat off";
+send_receive $lcd, "screen_set $PLAYER priority 128 name playback heartbeat off";
 send_receive $lcd, "widget_add $PLAYER title scroller";
 send_receive $lcd, "widget_add $PLAYER album scroller";
 send_receive $lcd, "widget_add $PLAYER artist scroller";
@@ -299,6 +299,15 @@ sub set_volume {
 	send_receive $lcd, "widget_set $PLAYER volume 1 4 $vol";
 }
 
+sub set_playing {
+	$playing = shift;
+	if ($playing == 0) {
+		send_receive $lcd, "screen_set $PLAYER -priority background";
+	} else {
+		send_receive $lcd, "screen_set $PLAYER -priority foreground";
+	}
+}
+
 sub clear_track {
 	set_title "";
 	set_album "";
@@ -306,7 +315,7 @@ sub clear_track {
 	set_status "stop";
 	$total_tracks = 0;
 	$current_track = 0;
-	$playing = 0;
+	set_playing 0;
 	set_progress;
 }
 
@@ -314,7 +323,7 @@ sub playlist {
 	my $cmd = shift;
 	switch ($cmd) {
 	case "clear"		{ clear_track; }
-	case "stop"		{ $playing = 0; set_status $cmd; }
+	case "stop"		{ set_playing 0; set_status $cmd; }
 	case "pause"		{ lms_send "mode"; }
 	case "title"		{ shift; set_title uri_unescape(shift); }
 	case "album"		{ shift; set_album uri_unescape(shift); }
@@ -344,7 +353,7 @@ sub playlist {
 		}
 		set_progress;
 		$elapsed_time = 0;
-		$playing = 1;
+		set_playing 1;
 	}
 	else			{ print "playlist: $cmd\n"; }
 	}
@@ -361,10 +370,10 @@ sub mixer {
 sub mode {
 	my $cmd = shift;
 	switch ($cmd) {
-	case "stop"	{ $playing = 0; set_status $cmd; }
-	case "pause"	{ $playing = 0; set_status $cmd; }
+	case "stop"	{ set_playing 0; set_status $cmd; }
+	case "pause"	{ set_playing 0; set_status $cmd; }
 	case "play"	{ 
-		$playing = 1;
+		set_playing 1;
 		set_status $cmd; 
 		lms_send "playlist tracks"; 
 		lms_send "playlist index"; 
