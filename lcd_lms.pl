@@ -41,7 +41,8 @@ sub error($@);
 sub usage($);
 sub send_receive;
 sub lms_query;
-sub lms_send;
+sub lms_query_send;
+sub lms_cmd_send;
 sub lms_response;
 
 my %opt = ();
@@ -108,6 +109,8 @@ send_receive $lcd, "widget_add $PLAYER artist scroller";
 send_receive $lcd, "widget_add $PLAYER volume string";
 send_receive $lcd, "widget_add $PLAYER status string";
 send_receive $lcd, "widget_add $PLAYER progress string";
+send_receive $lcd, "client_add_key Enter";
+send_receive $lcd, "client_add_key Escape";
 
 $sel = IO::Select->new( $lcd, $lms );
 
@@ -122,8 +125,8 @@ my $playing = 0;
 
 send_receive $lms, "listen 1";
 
-lms_send "mixer volume";
-lms_send "mode";
+lms_query_send "mixer volume";
+lms_query_send "mode";
 
 while () {
 	while (@ready = $sel->can_read(1)) {
@@ -136,6 +139,12 @@ while () {
 			}
 			if ( $fh == $lms && $input =~ /$player_id (.+)/ ) {
 				lms_response $1;
+			} elsif ( $fh == $lcd ) {
+				if ( $input eq "key Enter\n" ) {
+					lms_cmd_send "stop";
+				} elsif ( $input eq "key Escape\n" ) {
+					lms_cmd_send "pause";
+				}
 			}
 		}
 	}
@@ -198,10 +207,21 @@ print "lms_query: $ans";
 	}
 }
 
-sub lms_send {
+sub lms_query_send {
 	my $query = shift;
 
 	print $lms "$player_id $query ?\n";
+	my $ans = <$lms>;
+print "lms: $ans";
+	if ( $ans =~ /$player_id (.+)/) {
+		lms_response $1;
+	}
+}
+
+sub lms_cmd_send {
+	my $cmd = shift;
+
+	print $lms "$player_id $cmd\n";
 	my $ans = <$lms>;
 print "lms: $ans";
 	if ( $ans =~ /$player_id (.+)/) {
@@ -324,32 +344,32 @@ sub playlist {
 	switch ($cmd) {
 	case "clear"		{ clear_track; }
 	case "stop"		{ set_playing 0; set_status $cmd; }
-	case "pause"		{ lms_send "mode"; }
+	case "pause"		{ lms_query_send "mode"; }
 	case "title"		{ shift; set_title uri_unescape(shift); }
 	case "album"		{ shift; set_album uri_unescape(shift); }
 	case "artist"		{ shift; set_artist uri_unescape(shift); }
 	case "duration"		{ shift; $current_duration = shift; set_time; }
 	case "tracks"		{ $total_tracks = int(shift); }
-	case "loadtracks"	{ lms_send "playlist tracks"; }
-	case "addtracks"	{ lms_send "playlist tracks"; }
+	case "loadtracks"	{ lms_query_send "playlist tracks"; }
+	case "addtracks"	{ lms_query_send "playlist tracks"; }
 	case "index"		{ 
 		my $id = int(shift);
 		$current_track = $id + 1; 
 		set_progress;
-		lms_send "playlist title $id";
-		lms_send "playlist album $id";
-		lms_send "playlist artist $id";
-		lms_send "playlist duration $id";
-		lms_send "time";
+		lms_query_send "playlist title $id";
+		lms_query_send "playlist album $id";
+		lms_query_send "playlist artist $id";
+		lms_query_send "playlist duration $id";
+		lms_query_send "time";
 	}
 	case "newsong"		{ 
 		set_title uri_unescape(shift);
 		my $id = shift;
 		if (defined $id) { 
 			$current_track = $id + 1; 
-			lms_send "playlist album $id";
-			lms_send "playlist artist $id";
-			lms_send "playlist duration $id";
+			lms_query_send "playlist album $id";
+			lms_query_send "playlist artist $id";
+			lms_query_send "playlist duration $id";
 		}
 		set_progress;
 		$elapsed_time = 0;
@@ -375,8 +395,8 @@ sub mode {
 	case "play"	{ 
 		set_playing 1;
 		set_status $cmd; 
-		lms_send "playlist tracks"; 
-		lms_send "playlist index"; 
+		lms_query_send "playlist tracks"; 
+		lms_query_send "playlist index"; 
 	}
 	else		{ print "mode: $cmd\n"; }
 	}
