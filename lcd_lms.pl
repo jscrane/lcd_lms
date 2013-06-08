@@ -322,9 +322,9 @@ sub set_volume {
 sub set_playing {
 	$playing = shift;
 	if ($playing == 0) {
-		send_receive $lcd, "screen_set $PLAYER -priority background";
+		send_receive $lcd, "screen_set $PLAYER -priority background -backlight off";
 	} else {
-		send_receive $lcd, "screen_set $PLAYER -priority foreground";
+		send_receive $lcd, "screen_set $PLAYER -priority foreground -backlight on";
 	}
 }
 
