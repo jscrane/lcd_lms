@@ -9,6 +9,7 @@ use Fcntl;
 use Date::Parse;
 use Switch;
 use URI::Escape;
+use POSIX qw(strftime);
 
 ############################################################
 # Configurable part. Set it according your setup.
@@ -44,6 +45,7 @@ sub lms_query;
 sub lms_query_send;
 sub lms_cmd_send;
 sub lms_response;
+sub set_clock_widget;
 
 my %opt = ();
 getopts("s:p:S:P:n:", \%opt);
@@ -102,15 +104,21 @@ if ($lcdresponse =~ /\bhgt\s+(\d+)\b/) {
 
 send_receive $lcd, "client_set name {$progname}";
 send_receive $lcd, "screen_add $PLAYER";
-send_receive $lcd, "screen_set $PLAYER priority 128 name playback heartbeat off";
+send_receive $lcd, "screen_set $PLAYER priority foreground name playback heartbeat off";
 send_receive $lcd, "widget_add $PLAYER title scroller";
 send_receive $lcd, "widget_add $PLAYER album scroller";
 send_receive $lcd, "widget_add $PLAYER artist scroller";
 send_receive $lcd, "widget_add $PLAYER volume string";
 send_receive $lcd, "widget_add $PLAYER status string";
 send_receive $lcd, "widget_add $PLAYER progress string";
+
 send_receive $lcd, "client_add_key Enter";
 send_receive $lcd, "client_add_key Escape";
+
+send_receive $lcd, "screen_add CLOCK";
+send_receive $lcd, "screen_set CLOCK -priority info heartbeat off backlight off";
+send_receive $lcd, "widget_add CLOCK time string";
+send_receive $lcd, "widget_add CLOCK date string";
 
 $sel = IO::Select->new( $lcd, $lms );
 
@@ -122,6 +130,7 @@ my $title = "";
 my $artist = "";
 my $album = "";
 my $playing = 0;
+$t = 0;
 
 send_receive $lms, "listen 1";
 
@@ -150,8 +159,11 @@ while () {
 	}
 	if ($playing) {
 		$elapsed_time++;
-		set_time();
+		set_elapsed_time();
 	}
+	$fmt = ($t++ & 1)? "%H:%M": "%H %M";
+	set_clock_widget( "time", 2, strftime( $fmt, localtime() ));
+	set_clock_widget( "date", 4, strftime( "%a %B %d", localtime() ));
 }
 
 ## print out error message and eventually exit ##
@@ -292,7 +304,7 @@ sub set_progress {
 	send_receive $lcd, "widget_set $PLAYER progress 15 4 \"$p\"";
 }
 
-sub set_time {
+sub set_elapsed_time {
 	# duration is unknown for radio stream so just show elapsed time
 	my $remain = $current_duration - $elapsed_time;
 	if ($remain < 0) {
@@ -322,9 +334,9 @@ sub set_volume {
 sub set_playing {
 	$playing = shift;
 	if ($playing == 0) {
-		send_receive $lcd, "screen_set $PLAYER -priority background -backlight off";
+		send_receive $lcd, "screen_set $PLAYER priority background backlight off";
 	} else {
-		send_receive $lcd, "screen_set $PLAYER -priority foreground -backlight on";
+		send_receive $lcd, "screen_set $PLAYER priority foreground backlight on";
 	}
 }
 
@@ -348,7 +360,7 @@ sub playlist {
 	case "title"		{ shift; set_title uri_unescape(shift); }
 	case "album"		{ shift; set_album uri_unescape(shift); }
 	case "artist"		{ shift; set_artist uri_unescape(shift); }
-	case "duration"		{ shift; $current_duration = shift; set_time; }
+	case "duration"		{ shift; $current_duration = shift; set_elapsed_time; }
 	case "tracks"		{ $total_tracks = int(shift); }
 	case "loadtracks"	{ lms_query_send "playlist tracks"; }
 	case "addtracks"	{ lms_query_send "playlist tracks"; }
@@ -418,7 +430,16 @@ sub lms_response {
 	case "prefset" 	{ shift @s; prefset @s; }
 	case "mixer" 	{ shift @s; mixer @s; }
 	case "mode" 	{ shift @s; mode @s; }
-	case "time"	{ $elapsed_time = $s[1]; set_time; }
+	case "time"	{ $elapsed_time = $s[1]; set_elapsed_time; }
 	else		{ print "unknown: [$s[0]]\n"; }
 	}
 }
+
+sub set_clock_widget {
+        $w = shift;
+        $l = shift;
+        $s = shift;
+        $s = centre($width, $s);
+        send_receive $lcd, "widget_set CLOCK $w 1 $l \"$s\"";
+}
+
