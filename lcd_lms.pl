@@ -163,7 +163,7 @@ while () {
 	}
 	$fmt = ($t++ & 1)? "%H:%M": "%H %M";
 	set_clock_widget( "time", 2, strftime( $fmt, localtime() ));
-	set_clock_widget( "date", 4, strftime( "%a %B %d", localtime() ));
+	set_clock_widget( "date", 4, strftime( "%A %d %B", localtime() ));
 }
 
 ## print out error message and eventually exit ##
