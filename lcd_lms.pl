@@ -118,6 +118,7 @@ send_receive $lcd, "client_add_key Escape";
 send_receive $lcd, "screen_add CLOCK";
 send_receive $lcd, "screen_set CLOCK -priority info heartbeat off backlight off";
 send_receive $lcd, "widget_add CLOCK time string";
+send_receive $lcd, "widget_add CLOCK day string";
 send_receive $lcd, "widget_add CLOCK date string";
 
 $sel = IO::Select->new( $lcd, $lms );
@@ -163,7 +164,8 @@ while () {
 	}
 	$fmt = ($t++ & 1)? "%H:%M": "%H %M";
 	set_clock_widget( "time", 2, strftime( $fmt, localtime() ));
-	set_clock_widget( "date", 4, strftime( "%A %d %B", localtime() ));
+	set_clock_widget( "day", 3, strftime( "%A", localtime() ));
+	set_clock_widget( "date", 4, strftime( "%d %B %Y", localtime() ));
 }
 
 ## print out error message and eventually exit ##
@@ -279,7 +281,7 @@ sub set_artist {
 	my $n = length($artist);
 	# if artist and album are the same, and too long for the display,
 	# break them up nicely
-	if ($n > $width && $artist eq $album) {
+	if ($n > $width && ($artist eq $album || $album eq "")) {
 		my $pos = rindex($artist, ' ', $width);
 		if ($pos > 0) {
 			set_album substr($artist, 0, $pos);
