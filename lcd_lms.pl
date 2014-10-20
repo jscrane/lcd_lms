@@ -21,8 +21,6 @@ my $LCDD = "localhost";
 # Port on which LCDd listens to requests
 my $LCDPORT = "13666";
 
-my $LIGHT = 20;
-
 my $LMS = "rpi";
 my $LMSPORT = "9090";
 my $PLAYER = $ARGV[$#ARGV];
