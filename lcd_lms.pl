@@ -21,6 +21,9 @@ my $LCDD = "localhost";
 # Port on which LCDd listens to requests
 my $LCDPORT = "13666";
 
+#
+# docs here: http://rpi:9000/html/docs/cli-api.html
+#
 my $LMS = "rpi";
 my $LMSPORT = "9090";
 my $PLAYER = $ARGV[$#ARGV];
@@ -355,7 +358,7 @@ sub playlist {
 	my $cmd = shift;
 	switch ($cmd) {
 	case "clear"		{ clear_track; }
-	case "stop"		{ set_playing 0; set_status $cmd; }
+	case "stop"		{ clear_track; set_status $cmd; }
 	case "pause"		{ lms_query_send "mode"; }
 	case "title"		{ shift; set_title uri_unescape(shift); }
 	case "album"		{ shift; set_album uri_unescape(shift); }
