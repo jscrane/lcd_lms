@@ -10,6 +10,7 @@ use Date::Parse;
 use Switch;
 use URI::Escape;
 use POSIX qw(strftime);
+use Time::HiRes;
 
 ############################################################
 # Configurable part. Set it according your setup.
@@ -133,6 +134,7 @@ my $artist = "";
 my $album = "";
 my $playing = 0;
 $t = 0;
+my $start_time;
 
 send_receive $lms, "listen 1";
 
@@ -160,7 +162,7 @@ while () {
 		}
 	}
 	if ($playing) {
-		$elapsed_time++;
+		$elapsed_time = time() - $start_time;
 		set_elapsed_time();
 	}
 	$fmt = ($t++ & 1)? "%H:%M": "%H %M";
@@ -325,6 +327,12 @@ sub set_elapsed_time {
 	set_status $t;
 }
 
+sub set_time {
+	$elapsed_time = shift;
+	$start_time = time() - $elapsed_time;
+	set_elapsed_time;
+}
+
 sub set_volume {
 	my $vol = shift;
 	if ($vol eq "100") {
@@ -338,8 +346,13 @@ sub set_playing {
 	$playing = shift;
 	if ($playing == 0) {
 		send_receive $lcd, "screen_set $PLAYER priority background backlight off";
+		if ($current_duration > 0) {
+			$current_duration -= $elapsed_time;
+			$elapsed_time = 0;
+		}
 	} else {
 		send_receive $lcd, "screen_set $PLAYER priority foreground backlight on";
+		$start_time = time();
 	}
 }
 
@@ -385,9 +398,9 @@ sub playlist {
 			lms_query_send "playlist album $id";
 			lms_query_send "playlist artist $id";
 			lms_query_send "playlist duration $id";
+			lms_query_send "time";
 		}
 		set_progress;
-		$elapsed_time = 0;
 		set_playing 1;
 	}
 	else			{ print "playlist: $cmd\n"; }
@@ -433,7 +446,7 @@ sub lms_response {
 	case "prefset" 	{ shift @s; prefset @s; }
 	case "mixer" 	{ shift @s; mixer @s; }
 	case "mode" 	{ shift @s; mode @s; }
-	case "time"	{ $elapsed_time = $s[1]; set_elapsed_time; }
+	case "time"	{ set_time $s[1]; }
 	else		{ print "unknown: [$s[0]]\n"; }
 	}
 }
