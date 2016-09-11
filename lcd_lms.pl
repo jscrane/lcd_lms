@@ -217,7 +217,6 @@ sub lms_query {
 	print $lms "$query ?\n";
 	while () {
 		my $ans = <$lms>;
-print "lms_query: $ans";
 		if ($ans =~ /^$query (.+)/) {
 			return $1;
 		}
@@ -229,7 +228,6 @@ sub lms_query_send {
 
 	print $lms "$player_id $query ?\n";
 	my $ans = <$lms>;
-print "lms: $ans";
 	if ( $ans =~ /$player_id (.+)/) {
 		lms_response $1;
 	}
@@ -240,7 +238,6 @@ sub lms_cmd_send {
 
 	print $lms "$player_id $cmd\n";
 	my $ans = <$lms>;
-print "lms: $ans";
 	if ( $ans =~ /$player_id (.+)/) {
 		lms_response $1;
 	}
@@ -391,14 +388,18 @@ sub playlist {
 		lms_query_send "time";
 	}
 	case "newsong"		{ 
-		set_title uri_unescape(shift);
+		my $t = uri_unescape(shift);
 		my $id = shift;
 		if (defined $id) { 
+			set_title $t;
 			$current_track = $id + 1; 
 			lms_query_send "playlist album $id";
 			lms_query_send "playlist artist $id";
 			lms_query_send "playlist duration $id";
 			lms_query_send "time";
+		} else {
+			lms_query_send "playlist title 0";
+			lms_query_send "playlist artist 0";
 		}
 		set_progress;
 		set_playing 1;
