@@ -12,26 +12,14 @@ use URI::Escape;
 use POSIX qw(strftime);
 use Time::HiRes;
 
-############################################################
-# Configurable part. Set it according your setup.
-############################################################
-
-# Host which runs LCDproc daemon (LCDd)
 my $LCDD = "localhost";
-
-# Port on which LCDd listens to requests
 my $LCDPORT = "13666";
 
-#
 # docs here: http://rpi:9000/html/docs/cli-api.html
 #
 my $LMS = "rpi";
 my $LMSPORT = "9090";
 my $PLAYER = $ARGV[$#ARGV];
-
-############################################################
-# End of user configurable parts
-############################################################
 
 my $width = 20;
 my $lines = 4;
@@ -39,9 +27,7 @@ my $lines = 4;
 my $progname = $0;
    $progname =~ s#.*/(.*?)$#$1#;
 
-# declare functions
 sub error($@);
-sub usage($);
 sub send_receive;
 sub lms_query;
 sub lms_query_send;
@@ -50,20 +36,19 @@ sub lms_response;
 sub set_clock_widget;
 
 my %opt = ();
-getopts("s:p:S:P:n:", \%opt);
+getopts("d:p:l:P:", \%opt);
 
-$LCDD = defined($opt{s}) ? $opt{s} : $LCDD;
+$LCDD = defined($opt{d}) ? $opt{d} : $LCDD;
 $LCDPORT = defined($opt{p}) ? $opt{p} : $LCDPORT;
-$LMS = defined($opt{m}) ? $opt{m} : $LMS;
+$LMS = defined($opt{l}) ? $opt{l} : $LMS;
 $LMSPORT = defined($opt{P}) ? $opt{P} : $LMSPORT;
-$PLAYER = defined($opt{n}) ? $opt{n} : $PLAYER;
 
 # Connect to the servers...
 my $lms = IO::Socket::INET->new(
 		Proto     => 'tcp',
 		PeerAddr  => $LMS,
 		PeerPort  => $LMSPORT,
-	) or  error(1, "cannot connect to LMS server at $LMS:$LMSPORT");
+	) or error(1, "cannot connect to LMS server at $LMS:$LMSPORT");
 $lms->autoflush(1);
 
 my $player_id = "";
@@ -82,7 +67,7 @@ my $lcd = IO::Socket::INET->new(
 		Proto     => 'tcp',
 		PeerAddr  => $LCDD,
 		PeerPort  => $LCDPORT,
-	) or  error(1, "cannot connect to LCDd daemon at $LCDD:$LCDPORT");
+	) or error(1, "cannot connect to LCDd daemon at $LCDD:$LCDPORT");
 
 # Make sure our messages get there right away
 $lcd->autoflush(1);
@@ -171,36 +156,22 @@ while () {
 	set_clock_widget( "date", 4, strftime( "%d %B %Y", localtime() ));
 }
 
-## print out error message and eventually exit ##
-# Synopsis:  error($status, $message)
 sub error($@) {
-my $status = shift;
-my @msg = @_;
+	my $status = shift;
+	my @msg = @_;
 
-  print STDERR $progname . ": " . join(" ", @msg) . "\n";
-
-  exit($status)  if ($status);
+	print STDERR $progname . ": " . join(" ", @msg) . "\n";
+	exit($status) if ($status);
 }
 
-
-## print out usage message and exit ##
-# Synopsis:  usage($status)
-sub usage($) {
-my $status = shift;
-
-  print STDERR "Usage: $progname [<options>] <file>\n";
-  if (!$status) {
-    print STDERR "  where <options> are\n" .
-                 "    -s <server>                connect to <server> (default: $LCDD)\n" .
-                 "    -p <port>                  connect to <port> on <server> (default: $LCDPORT)\n" .
-		 "    -h                         show this help page\n" .
-		 "    -V                         display version number\n";
-  }
-  else {
-    print STDERR "For help, type: $progname -h\n";
-  }  
-
-  exit($status);
+sub HELP_MESSAGE {
+	print STDERR "Usage: $progname [<options>] <player>\n";
+	print STDERR "    where <options> are:\n" .
+		"	-d <server>	connect to <LCDd> (default: $LCDD)\n" .
+		"	-p <port>	connect to <port> on <LCDd> (default: $LCDPORT)\n" .
+		"	-l <server>	connect to <LMS> (default: $LMS)\n" .
+		"	-P <port>	connect to <port> on <LMS> (default: $LMSPORT)\n";
+	exit(0);
 }
 
 sub send_receive {
