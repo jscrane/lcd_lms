@@ -11,6 +11,7 @@ use Switch;
 use URI::Escape;
 use POSIX qw(strftime);
 use Time::HiRes;
+use Log::Message::Simple qw(debug);
 
 my $LCDD = "localhost";
 my $LCDPORT = "13666";
@@ -29,6 +30,7 @@ my $progname = $0;
 
 sub error($@);
 sub send_receive;
+sub lcd_send_receive;
 sub lms_query;
 sub lms_query_send;
 sub lms_cmd_send;
@@ -36,12 +38,14 @@ sub lms_response;
 sub set_clock_widget;
 
 my %opt = ();
-getopts("d:p:l:P:", \%opt);
+getopts("d:p:l:P:v:", \%opt);
 
 $LCDD = defined($opt{d}) ? $opt{d} : $LCDD;
 $LCDPORT = defined($opt{p}) ? $opt{p} : $LCDPORT;
 $LMS = defined($opt{l}) ? $opt{l} : $LMS;
 $LMSPORT = defined($opt{P}) ? $opt{P} : $LMSPORT;
+my $deb_lcd = defined($opt{v}) ? $opt{v} eq 'lcd': 0;
+my $deb_lms = defined($opt{v}) ? $opt{v} eq 'lms': 0;
 
 # Connect to the servers...
 my $lms = IO::Socket::INET->new(
@@ -53,7 +57,7 @@ $lms->autoflush(1);
 
 my $player_id = "";
 my $pcount = lms_query "player count";
-for ($i = 0; $i < $pcount; $i++) {
+for (my $i = 0; $i < $pcount; $i++) {
 	my $p = lms_query "player name $i";
 	if ($p eq $PLAYER) {
 		$player_id = lms_query "player id $i";
@@ -79,7 +83,7 @@ $read_set->add($lms);
 sleep 1;	# Give server plenty of time to notice us...
 
 my $lcdresponse = send_receive $lcd, "hello";
-print $lcdresponse;
+debug( $lcdresponse, $deb_lcd );
 
 # get width & height from server's greet message
 if ($lcdresponse =~ /\bwid\s+(\d+)\b/) {
@@ -89,26 +93,26 @@ if ($lcdresponse =~ /\bhgt\s+(\d+)\b/) {
 	$lines = 0 + $1;
 }	
 
-send_receive $lcd, "client_set name {$progname}";
-send_receive $lcd, "screen_add $PLAYER";
-send_receive $lcd, "screen_set $PLAYER priority foreground name playback heartbeat off";
-send_receive $lcd, "widget_add $PLAYER title scroller";
-send_receive $lcd, "widget_add $PLAYER album scroller";
-send_receive $lcd, "widget_add $PLAYER artist scroller";
-send_receive $lcd, "widget_add $PLAYER volume string";
-send_receive $lcd, "widget_add $PLAYER status string";
-send_receive $lcd, "widget_add $PLAYER progress string";
+lcd_send_receive "client_set name {$progname}";
+lcd_send_receive "screen_add $PLAYER";
+lcd_send_receive "screen_set $PLAYER priority foreground name playback heartbeat off";
+lcd_send_receive "widget_add $PLAYER title scroller";
+lcd_send_receive "widget_add $PLAYER album scroller";
+lcd_send_receive "widget_add $PLAYER artist scroller";
+lcd_send_receive "widget_add $PLAYER volume string";
+lcd_send_receive "widget_add $PLAYER status string";
+lcd_send_receive "widget_add $PLAYER progress string";
 
-send_receive $lcd, "client_add_key Enter";
-send_receive $lcd, "client_add_key Escape";
+lcd_send_receive "client_add_key Enter";
+lcd_send_receive "client_add_key Escape";
 
-send_receive $lcd, "screen_add CLOCK";
-send_receive $lcd, "screen_set CLOCK -priority info heartbeat off backlight off";
-send_receive $lcd, "widget_add CLOCK time string";
-send_receive $lcd, "widget_add CLOCK day string";
-send_receive $lcd, "widget_add CLOCK date string";
+lcd_send_receive "screen_add CLOCK";
+lcd_send_receive "screen_set CLOCK -priority info heartbeat off backlight off";
+lcd_send_receive "widget_add CLOCK time string";
+lcd_send_receive "widget_add CLOCK day string";
+lcd_send_receive "widget_add CLOCK date string";
 
-$sel = IO::Select->new( $lcd, $lms );
+my $sel = IO::Select->new( $lcd, $lms );
 
 my $total_tracks = 0;
 my $current_track = 0;
@@ -118,7 +122,7 @@ my $title = "";
 my $artist = "";
 my $album = "";
 my $playing = 0;
-$t = 0;
+my $t = 0;
 my $start_time;
 
 send_receive $lms, "listen 1";
@@ -127,7 +131,7 @@ lms_query_send "mixer volume";
 lms_query_send "mode";
 
 while () {
-	while (@ready = $sel->can_read(1)) {
+	while (my @ready = $sel->can_read(1)) {
 		foreach $fh (@ready) {
 			my $input = <$fh>;
 			if (!defined $input) {
@@ -150,7 +154,7 @@ while () {
 		$elapsed_time = time() - $start_time;
 		set_elapsed_time();
 	}
-	$fmt = ($t++ & 1)? "%H:%M": "%H %M";
+	my $fmt = ($t++ & 1)? "%H:%M": "%H %M";
 	set_clock_widget( "time", 2, strftime( $fmt, localtime() ));
 	set_clock_widget( "day", 3, strftime( "%A", localtime() ));
 	set_clock_widget( "date", 4, strftime( "%d %B %Y", localtime() ));
@@ -170,7 +174,8 @@ sub HELP_MESSAGE {
 		"	-d <server>	connect to <LCDd> (default: $LCDD)\n" .
 		"	-p <port>	connect to <port> on <LCDd> (default: $LCDPORT)\n" .
 		"	-l <server>	connect to <LMS> (default: $LMS)\n" .
-		"	-P <port>	connect to <port> on <LMS> (default: $LMSPORT)\n";
+		"	-P <port>	connect to <port> on <LMS> (default: $LMSPORT)\n" .
+		"	-v <lcd | lms>	debug conversation with either lcd or lms\n";
 	exit(0);
 }
 
@@ -182,13 +187,26 @@ sub send_receive {
 	return <$fd>;
 }
 
+sub lcd_send_receive {
+	my $cmd = shift;
+	debug( "lcd < $cmd", $deb_lcd );
+	my $res = send_receive $lcd, $cmd;
+	chomp $res;
+	debug( "lcd > $res", $deb_lcd );
+	return $res;
+}
+
 sub lms_query {
 	my $query = shift;
 
+	debug( "lms < $query", $deb_lms );
 	print $lms "$query ?\n";
 	while () {
 		my $ans = <$lms>;
+		chomp $ans;
+		debug( "lms > $ans", $deb_lms );
 		if ($ans =~ /^$query (.+)/) {
+			debug( "lms > $1", $deb_lms );
 			return $1;
 		}
 	}
@@ -198,7 +216,11 @@ sub lms_query_send {
 	my $query = shift;
 
 	print $lms "$player_id $query ?\n";
+	debug( "lms < $player_id $query", $deb_lms );
+
 	my $ans = <$lms>;
+	chomp $ans;
+	debug( "lms > $ans", $deb_lms );
 	if ( $ans =~ /$player_id (.+)/) {
 		lms_response $1;
 	}
@@ -226,7 +248,7 @@ sub set_title {
 	$title = shift;
 	$title = "" if (!defined $title);
 	$title = centre($width, $title);
-	send_receive $lcd, "widget_set $PLAYER title 1 1 $width 1 v 8 \"$title\"";
+	lcd_send_receive "widget_set $PLAYER title 1 1 $width 1 v 8 \"$title\"";
 }
 
 sub set_album {
@@ -243,7 +265,7 @@ sub set_album {
 			set_title substr($title, 0, $pos);
 		}
 	}
-	send_receive $lcd, "widget_set $PLAYER album 1 2 $width 2 v 8 \"$album\"";
+	lcd_send_receive "widget_set $PLAYER album 1 2 $width 2 v 8 \"$album\"";
 }
 
 sub set_artist {
@@ -260,12 +282,12 @@ sub set_artist {
 		}
 	}
 	$artist = centre($width, $artist);
-	send_receive $lcd, "widget_set $PLAYER artist 1 3 $width 3 v 8 \"$artist\"";
+	lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 v 8 \"$artist\"";
 }
 
 sub set_status {
-	$state = centre(10, shift);
-	send_receive $lcd, "widget_set $PLAYER status 6 4 \"$state\"";
+	my $state = centre(10, shift);
+	lcd_send_receive "widget_set $PLAYER status 6 4 \"$state\"";
 }
 
 sub set_progress {
@@ -274,7 +296,7 @@ sub set_progress {
 		$p = sprintf "%d/%d", $current_track, $total_tracks;
 		$p = sprintf "% 6s", $p;
 	}
-	send_receive $lcd, "widget_set $PLAYER progress 15 4 \"$p\"";
+	lcd_send_receive "widget_set $PLAYER progress 15 4 \"$p\"";
 }
 
 sub set_elapsed_time {
@@ -307,19 +329,19 @@ sub set_volume {
 		$vol = "99";
 	}
 	$vol = sprintf "%02s", $vol;
-	send_receive $lcd, "widget_set $PLAYER volume 1 4 $vol";
+	lcd_send_receive "widget_set $PLAYER volume 1 4 $vol";
 }
 
 sub set_playing {
 	$playing = shift;
 	if ($playing == 0) {
-		send_receive $lcd, "screen_set $PLAYER priority background backlight off";
+		lcd_send_receive "screen_set $PLAYER priority background backlight off";
 		if ($current_duration > 0) {
 			$current_duration -= $elapsed_time;
 			$elapsed_time = 0;
 		}
 	} else {
-		send_receive $lcd, "screen_set $PLAYER priority foreground backlight on";
+		lcd_send_receive "screen_set $PLAYER priority foreground backlight on";
 		$start_time = time();
 	}
 }
