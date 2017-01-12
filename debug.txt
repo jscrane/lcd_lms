@@ -1,0 +1,13 @@
+[DEBUG] lms < player count
+[DEBUG] lms > player count 1
+[DEBUG] lms > 1
+[DEBUG] lms < player name 0
+[DEBUG] lms > player name 0 SqueezeLite
+[DEBUG] lms > SqueezeLite
+[DEBUG] lms < player id 0
+[DEBUG] lms > player id 0 b8%3A27%3Aeb%3A75%3Aa2%3A23
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23
+[DEBUG] lms < b8%3A27%3Aeb%3A75%3Aa2%3A23 mixer volume
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 mixer volume 70
+[DEBUG] lms < b8%3A27%3Aeb%3A75%3Aa2%3A23 mode
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 mode stop
