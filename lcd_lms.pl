@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 use 5.005;
-#use strict;
+use strict;
 use Getopt::Std;
 use IO::Socket;
 use IO::Select;
@@ -36,6 +36,12 @@ sub lms_query_send;
 sub lms_cmd_send;
 sub lms_response;
 sub set_clock_widget;
+sub set_title;
+sub set_album;
+sub set_artist;
+sub set_status;
+sub set_playing;
+sub set_volume;
 
 my %opt = ();
 getopts("d:p:l:P:v:", \%opt);
@@ -132,6 +138,7 @@ lms_query_send "mode";
 
 while () {
 	while (my @ready = $sel->can_read(1)) {
+		my $fh;
 		foreach $fh (@ready) {
 			my $input = <$fh>;
 			if (!defined $input) {
@@ -357,6 +364,11 @@ sub clear_track {
 	set_progress;
 }
 
+sub playlist;
+sub prefset;
+sub mixer;
+sub mode;
+
 sub playlist {
 	my $cmd = shift;
 	switch ($cmd) {
@@ -446,9 +458,9 @@ sub lms_response {
 }
 
 sub set_clock_widget {
-        $w = shift;
-        $l = shift;
-        $s = shift;
+        my $w = shift;
+        my $l = shift;
+        my $s = shift;
         $s = centre($width, $s);
         send_receive $lcd, "widget_set CLOCK $w 1 $l \"$s\"";
 }
