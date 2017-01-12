@@ -50,8 +50,9 @@ $LCDD = defined($opt{d}) ? $opt{d} : $LCDD;
 $LCDPORT = defined($opt{p}) ? $opt{p} : $LCDPORT;
 $LMS = defined($opt{l}) ? $opt{l} : $LMS;
 $LMSPORT = defined($opt{P}) ? $opt{P} : $LMSPORT;
-my $deb_lcd = defined($opt{v}) ? $opt{v} eq 'lcd': 0;
-my $deb_lms = defined($opt{v}) ? $opt{v} eq 'lms': 0;
+my $deb_all = defined($opt{v}) ? $opt{v} eq 'all': 0;
+my $deb_lcd = $deb_all || (defined($opt{v}) ? $opt{v} eq 'lcd': 0);
+my $deb_lms = $deb_all || (defined($opt{v}) ? $opt{v} eq 'lms': 0);
 
 # Connect to the servers...
 my $lms = IO::Socket::INET->new(
@@ -178,11 +179,11 @@ sub error($@) {
 sub HELP_MESSAGE {
 	print STDERR "Usage: $progname [<options>] <player>\n";
 	print STDERR "    where <options> are:\n" .
-		"	-d <server>	connect to <LCDd> (default: $LCDD)\n" .
-		"	-p <port>	connect to <port> on <LCDd> (default: $LCDPORT)\n" .
-		"	-l <server>	connect to <LMS> (default: $LMS)\n" .
-		"	-P <port>	connect to <port> on <LMS> (default: $LMSPORT)\n" .
-		"	-v <lcd | lms>	debug conversation with either lcd or lms\n";
+		"	-d <server>		connect to <LCDd> (default: $LCDD)\n" .
+		"	-p <port>		connect to <port> on <LCDd> (default: $LCDPORT)\n" .
+		"	-l <server>		connect to <LMS> (default: $LMS)\n" .
+		"	-P <port>		connect to <port> on <LMS> (default: $LMSPORT)\n" .
+		"	-v <lcd | lms | all>	debug conversation with lcd, lms or both\n";
 	exit(0);
 }
 
