@@ -44,12 +44,16 @@ sub set_playing;
 sub set_volume;
 
 my %opt = ();
-getopts("d:p:l:P:v:", \%opt);
+getopts("d:l:v:", \%opt);
 
-$LCDD = defined($opt{d}) ? $opt{d} : $LCDD;
-$LCDPORT = defined($opt{p}) ? $opt{p} : $LCDPORT;
-$LMS = defined($opt{l}) ? $opt{l} : $LMS;
-$LMSPORT = defined($opt{P}) ? $opt{P} : $LMSPORT;
+my ($dh, $dp) = split(/:/, $opt{d}) if (defined($opt{d}));
+$LCDD = $dh if (defined($dh) && $dh ne '');
+$LCDPORT = $dp if (defined($dp));
+
+my ($lh, $lp) = split(/:/, $opt{l}) if (defined($opt{l}));
+$LMS = $lh if (defined($lh) && $lh ne '');
+$LMSPORT = $lp if (defined($lp));
+
 my $deb_all = defined($opt{v}) ? $opt{v} eq 'all': 0;
 my $deb_lcd = $deb_all || (defined($opt{v}) ? $opt{v} eq 'lcd': 0);
 my $deb_lms = $deb_all || (defined($opt{v}) ? $opt{v} eq 'lms': 0);
@@ -179,10 +183,8 @@ sub error($@) {
 sub HELP_MESSAGE {
 	print STDERR "Usage: $progname [<options>] <player>\n";
 	print STDERR "    where <options> are:\n" .
-		"	-d <server>		connect to <LCDd> (default: $LCDD)\n" .
-		"	-p <port>		connect to <port> on <LCDd> (default: $LCDPORT)\n" .
-		"	-l <server>		connect to <LMS> (default: $LMS)\n" .
-		"	-P <port>		connect to <port> on <LMS> (default: $LMSPORT)\n" .
+		"	-d <server:port>	connect to LCDd (default: $LCDD:$LCDPORT)\n" .
+		"	-l <server:port>	connect to LMS (default: $LMS:$LMSPORT)\n" .
 		"	-v <lcd | lms | all>	debug conversation with lcd, lms or both\n";
 	exit(0);
 }
@@ -410,7 +412,7 @@ sub playlist {
 		set_progress;
 		set_playing 1;
 	}
-	else			{ print "playlist: $cmd\n"; }
+	else { debug( "playlist: $cmd\n", $deb_all ); }
 	}
 }
 
@@ -418,7 +420,7 @@ sub mixer {
 	my $cmd = shift;
 	switch ($cmd) {
 	case "volume"	{ set_volume uri_unescape(shift); }
-	else		{ print "mixer: $cmd\n"; }
+	else		{ debug( "mixer: $cmd\n", $deb_all ); }
 	}
 }
 
@@ -433,7 +435,7 @@ sub mode {
 		lms_query_send "playlist tracks"; 
 		lms_query_send "playlist index"; 
 	}
-	else		{ print "mode: $cmd\n"; }
+	else		{ debug( "mode: $cmd\n", $deb_all ); }
 	}
 }
 
@@ -441,7 +443,7 @@ sub prefset {
 	my $cmd = shift;
 	switch ($cmd) {
 	case "server"	{ if (shift eq "volume") { set_volume shift; } }
-	else		{ print "prefset: $cmd\n"; }
+	else		{ debug( "prefset: $cmd\n", $deb_all ); }
 	}
 }
 
@@ -454,7 +456,7 @@ sub lms_response {
 	case "mixer" 	{ shift @s; mixer @s; }
 	case "mode" 	{ shift @s; mode @s; }
 	case "time"	{ set_time $s[1]; }
-	else		{ print "unknown: [$s[0]]\n"; }
+	else		{ debug( "unknown: [$s[0]]\n", $deb_all ); }
 	}
 }
 
