@@ -13,14 +13,11 @@ use POSIX qw(strftime);
 use Time::HiRes;
 use Log::Message::Simple qw(debug);
 
-my $LCDD = "localhost";
-my $LCDPORT = "13666";
+my $DEF_LCDD = "localhost";
+my $DEF_LCDPORT = "13666";
 
-# docs here: http://rpi:9000/html/docs/cli-api.html
-#
-my $LMS = "rpi";
-my $LMSPORT = "9090";
-my $PLAYER = $ARGV[$#ARGV];
+my $DEF_LMS = "rpi";
+my $DEF_LMSPORT = "9090";
 
 my $width = 20;
 my $lines = 4;
@@ -42,21 +39,28 @@ sub set_artist;
 sub set_status;
 sub set_playing;
 sub set_volume;
+sub HELP_MESSAGE;
 
 my %opt = ();
 getopts("d:l:v:", \%opt);
 
 my ($dh, $dp) = split(/:/, $opt{d}) if (defined($opt{d}));
-$LCDD = $dh if (defined($dh) && $dh ne '');
-$LCDPORT = $dp if (defined($dp));
+my $LCDD = (defined($dh) && $dh ne '')? $dh: $DEF_LCDD;
+my $LCDPORT = (defined($dp) && $dp ne '')? $dp: $DEF_LCDPORT;
 
 my ($lh, $lp) = split(/:/, $opt{l}) if (defined($opt{l}));
-$LMS = $lh if (defined($lh) && $lh ne '');
-$LMSPORT = $lp if (defined($lp));
+my $LMS = (defined($lh) && $lh ne '')? $lh: $DEF_LMS;
+my $LMSPORT = (defined($lp) && $lp ne '')? $lp: $DEF_LMSPORT;
 
 my $deb_all = defined($opt{v}) ? $opt{v} eq 'all': 0;
 my $deb_lcd = $deb_all || (defined($opt{v}) ? $opt{v} eq 'lcd': 0);
 my $deb_lms = $deb_all || (defined($opt{v}) ? $opt{v} eq 'lms': 0);
+
+if ( $#ARGV != 0 ) {
+	HELP_MESSAGE;
+}
+
+my $PLAYER = $ARGV[0];
 
 # Connect to the servers...
 my $lms = IO::Socket::INET->new(
@@ -183,8 +187,8 @@ sub error($@) {
 sub HELP_MESSAGE {
 	print STDERR "Usage: $progname [<options>] <player>\n";
 	print STDERR "    where <options> are:\n" .
-		"	-d <server:port>	connect to LCDd (default: $LCDD:$LCDPORT)\n" .
-		"	-l <server:port>	connect to LMS (default: $LMS:$LMSPORT)\n" .
+		"	-d <server:port>	connect to LCDd $DEF_LCDD:$DEF_LCDPORT)\n" .
+		"	-l <server:port>	connect to LMS ($DEF_LMS:$DEF_LMSPORT)\n" .
 		"	-v <lcd | lms | all>	debug conversation with lcd, lms or both\n";
 	exit(0);
 }
