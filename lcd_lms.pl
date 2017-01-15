@@ -11,7 +11,7 @@ use Switch;
 use URI::Escape;
 use POSIX qw(strftime);
 use Time::HiRes;
-use Log::Message::Simple qw(debug);
+use Log::Message::Simple qw(debug msg);
 
 my $DEF_LCDD = "localhost";
 my $DEF_LCDPORT = "13666";
@@ -140,7 +140,10 @@ my $playing = 0;
 my $t = 0;
 my $start_time;
 
-send_receive $lms, "listen 1";
+debug( "lms < listen 1", $deb_lms );
+my $ans = send_receive $lms, "listen 1";
+chomp $ans;
+debug( "lms > $ans", $deb_lms );
 
 lms_query_send "mixer volume";
 lms_query_send "mode";
@@ -156,6 +159,8 @@ while () {
 				exit;
 			}
 			if ( $fh == $lms && $input =~ /$player_id (.+)/ ) {
+				chomp $input;
+				debug( "lms > $input", $deb_lms );
 				lms_response $1;
 			} elsif ( $fh == $lcd ) {
 				if ( $input eq "key Enter\n" ) {
@@ -187,7 +192,7 @@ sub error($@) {
 sub HELP_MESSAGE {
 	print STDERR "Usage: $progname [<options>] <player>\n";
 	print STDERR "    where <options> are:\n" .
-		"	-d <server:port>	connect to LCDd $DEF_LCDD:$DEF_LCDPORT)\n" .
+		"	-d <server:port>	connect to LCDd ($DEF_LCDD:$DEF_LCDPORT)\n" .
 		"	-l <server:port>	connect to LMS ($DEF_LMS:$DEF_LMSPORT)\n" .
 		"	-v <lcd | lms | all>	debug conversation with lcd, lms or both\n";
 	exit(0);
@@ -213,8 +218,9 @@ sub lcd_send_receive {
 sub lms_query {
 	my $query = shift;
 
-	debug( "lms < $query", $deb_lms );
 	print $lms "$query ?\n";
+	debug( "lms < $query ?", $deb_lms );
+
 	while () {
 		my $ans = <$lms>;
 		chomp $ans;
@@ -230,7 +236,7 @@ sub lms_query_send {
 	my $query = shift;
 
 	print $lms "$player_id $query ?\n";
-	debug( "lms < $player_id $query", $deb_lms );
+	debug( "lms < $player_id $query ?", $deb_lms );
 
 	my $ans = <$lms>;
 	chomp $ans;
@@ -244,7 +250,11 @@ sub lms_cmd_send {
 	my $cmd = shift;
 
 	print $lms "$player_id $cmd\n";
+	debug( "lms < $player_id $cmd", $deb_lms );
+
 	my $ans = <$lms>;
+	chomp $ans;
+	debug( "lms > $ans", $deb_lms );
 	if ( $ans =~ /$player_id (.+)/) {
 		lms_response $1;
 	}
@@ -259,7 +269,7 @@ sub centre {
 }
 
 sub set_title {
-	$title = shift;
+	my $title = shift;
 	$title = "" if (!defined $title);
 	$title = centre($width, $title);
 	lcd_send_receive "widget_set $PLAYER title 1 1 $width 1 v 8 \"$title\"";
@@ -416,7 +426,7 @@ sub playlist {
 		set_progress;
 		set_playing 1;
 	}
-	else { debug( "playlist: $cmd\n", $deb_all ); }
+	else { msg( "playlist: $cmd", $deb_lms ); }
 	}
 }
 
@@ -424,7 +434,7 @@ sub mixer {
 	my $cmd = shift;
 	switch ($cmd) {
 	case "volume"	{ set_volume uri_unescape(shift); }
-	else		{ debug( "mixer: $cmd\n", $deb_all ); }
+	else		{ msg( "mixer: $cmd", $deb_lms ); }
 	}
 }
 
@@ -439,7 +449,7 @@ sub mode {
 		lms_query_send "playlist tracks"; 
 		lms_query_send "playlist index"; 
 	}
-	else		{ debug( "mode: $cmd\n", $deb_all ); }
+	else		{ msg( "mode: $cmd", $deb_lms ); }
 	}
 }
 
@@ -447,7 +457,7 @@ sub prefset {
 	my $cmd = shift;
 	switch ($cmd) {
 	case "server"	{ if (shift eq "volume") { set_volume shift; } }
-	else		{ debug( "prefset: $cmd\n", $deb_all ); }
+	else		{ msg( "prefset: $cmd", $deb_lms ); }
 	}
 }
 
@@ -460,7 +470,9 @@ sub lms_response {
 	case "mixer" 	{ shift @s; mixer @s; }
 	case "mode" 	{ shift @s; mode @s; }
 	case "time"	{ set_time $s[1]; }
-	else		{ debug( "unknown: [$s[0]]\n", $deb_all ); }
+	case "play"	{}
+	case "pause"	{}
+	else		{ msg( "unknown: [$r]", $deb_lms ); }
 	}
 }
 

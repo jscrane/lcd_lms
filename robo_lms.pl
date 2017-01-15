@@ -21,12 +21,18 @@ foreach $line (<>) {
 	print "$line";
 	chomp $line;
 	my ($d, $l, $dir, $proto) = split(/ /, $line, 4);
-	if ($dir eq '>') {
+	if ($d ne "[DEBUG]" || $l ne "lms") {
+		print "Skipping [$line]\n";
+	} elsif ($dir eq '>') {
 		print $client_socket "$proto\n";
 	} else {
 		my $client = <$client_socket>;
+		die "EOF" if (!defined($client));
 		$client =~ s/\r\n//g;
-		die "Expected [$proto] but got [$client]\n" if ($client ne $proto);
+		chomp $client;
+		if ($client ne $proto) {
+			die "Expected [$proto] but got [$client]\n";
+		}
 	}
 }
 
