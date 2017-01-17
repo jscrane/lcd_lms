@@ -158,10 +158,8 @@ while () {
 				close ($lms);
 				exit;
 			}
-			if ( $fh == $lms && $input =~ /$player_id (.+)/ ) {
-				chomp $input;
-				debug( "lms > $input", $deb_lms );
-				lms_response $1;
+			if ( $fh == $lms ) {
+				lms_response $input;
 			} elsif ( $fh == $lcd ) {
 				if ( $input eq "key Enter\n" ) {
 					lms_cmd_send "stop";
@@ -238,12 +236,7 @@ sub lms_query_send {
 	print $lms "$player_id $query ?\n";
 	debug( "lms < $player_id $query ?", $deb_lms );
 
-	my $ans = <$lms>;
-	chomp $ans;
-	debug( "lms > $ans", $deb_lms );
-	if ( $ans =~ /$player_id (.+)/) {
-		lms_response $1;
-	}
+	lms_response <$lms>;
 }
 
 sub lms_cmd_send {
@@ -252,12 +245,7 @@ sub lms_cmd_send {
 	print $lms "$player_id $cmd\n";
 	debug( "lms < $player_id $cmd", $deb_lms );
 
-	my $ans = <$lms>;
-	chomp $ans;
-	debug( "lms > $ans", $deb_lms );
-	if ( $ans =~ /$player_id (.+)/) {
-		lms_response $1;
-	}
+	lms_response <$lms>;
 }
 
 sub centre {
@@ -463,17 +451,22 @@ sub prefset {
 }
 
 sub lms_response {
-	my $r = shift;
-	my @s = split(/ /, $r);
-	switch ($s[0]) {
-	case "playlist" { shift @s; playlist @s; }
-	case "prefset" 	{ shift @s; prefset @s; }
-	case "mixer" 	{ shift @s; mixer @s; }
-	case "mode" 	{ shift @s; mode @s; }
-	case "time"	{ set_time $s[1]; }
-	case "play"	{}
-	case "pause"	{}
-	else		{ msg( "unknown: [$r]", $deb_lms ); }
+	my $input = shift;
+	debug( "lms > $input", $deb_lms );
+	if ( $input =~ /$player_id (.+)/ ) {
+		chomp $input;
+		my $r = $1;
+		my @s = split(/ /, $r);
+		switch ($s[0]) {
+		case "playlist" { shift @s; playlist @s; }
+		case "prefset" 	{ shift @s; prefset @s; }
+		case "mixer" 	{ shift @s; mixer @s; }
+		case "mode" 	{ shift @s; mode @s; }
+		case "time"	{ set_time $s[1]; }
+		case "play"	{}
+		case "pause"	{}
+		else		{ msg( "unknown: [$r]", $deb_lms ); }
+		}
 	}
 }
 
