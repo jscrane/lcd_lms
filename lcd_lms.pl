@@ -236,7 +236,8 @@ sub lms_query_send {
 	print $lms "$player_id $query ?\n";
 	debug( "lms < $player_id $query ?", $deb_lms );
 
-	lms_response <$lms>;
+	my $ans = <$lms>;
+	lms_response $ans;
 }
 
 sub lms_cmd_send {
@@ -245,7 +246,8 @@ sub lms_cmd_send {
 	print $lms "$player_id $cmd\n";
 	debug( "lms < $player_id $cmd", $deb_lms );
 
-	lms_response <$lms>;
+	my $ans = <$lms>;
+	lms_response $ans;
 }
 
 sub centre {
@@ -452,9 +454,9 @@ sub prefset {
 
 sub lms_response {
 	my $input = shift;
+	chomp $input;
 	debug( "lms > $input", $deb_lms );
 	if ( $input =~ /$player_id (.+)/ ) {
-		chomp $input;
 		my $r = $1;
 		my @s = split(/ /, $r);
 		switch ($s[0]) {
