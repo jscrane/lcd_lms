@@ -119,7 +119,7 @@ lcd_send_receive "widget_add $PLAYER status string";
 lcd_send_receive "widget_add $PLAYER progress string";
 
 lcd_send_receive "client_add_key Enter";
-lcd_send_receive "client_add_key Escape";
+lcd_send_receive "client_add_key Down";
 
 lcd_send_receive "screen_add CLOCK";
 lcd_send_receive "screen_set CLOCK -priority info heartbeat off backlight off";
@@ -163,7 +163,7 @@ while () {
 			} elsif ( $fh == $lcd ) {
 				if ( $input eq "key Enter\n" ) {
 					lms_cmd_send "stop";
-				} elsif ( $input eq "key Escape\n" ) {
+				} elsif ( $input eq "key Down\n" ) {
 					lms_cmd_send "pause";
 				}
 			}
