@@ -2,6 +2,7 @@
 
 use strict;
 use IO::Socket::INET;
+use Time::HiRes qw(usleep);
 
 $| = 1;
 
@@ -34,6 +35,7 @@ foreach $line (<>) {
 			die "Expected [$proto] but got [$client]\n";
 		}
 	}
+	usleep 250000;
 }
 
 close $client_socket;
