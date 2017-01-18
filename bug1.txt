@@ -1,0 +1,48 @@
+[DEBUG] lms < player count ?
+[DEBUG] lms > player count 1
+[DEBUG] lms > 1
+[DEBUG] lms < player name 0 ?
+[DEBUG] lms > player name 0 LCDpi
+[DEBUG] lms > LCDpi
+[DEBUG] lms < player id 0 ?
+[DEBUG] lms > player id 0 b8%3A27%3Aeb%3Aed%3A76%3Aff
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff
+[DEBUG] lms < listen 1
+[DEBUG] lms > listen 1
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff mixer volume ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff mixer volume 90
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff mode ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff mode play
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist tracks ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist tracks 17
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist index ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist index 11
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist title 11 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist title 11 Morning%20Sun
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist album 11 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist album 11 Tone%20Poems
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist artist 11 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist artist 11 David%20Grisman%20and%20Tony%20Rice
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist duration 11 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist duration 11 254
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff time ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff time 9.34090414428711
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff button jump_fwd
+[MSG] unknown: [button jump_fwd  ]
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist jump %2B1
+[MSG] playlist: jump
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist stop
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff prefset server currentSong 12
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist open wimp%3A%2F%2F9102272.flac
+[MSG] playlist: open
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist open http%3A%2F%2F46.audio-pop.tidal.com%2F2722019%2F4e087dab56b6953e8223657dccd4d959_26.flac%3F__token__%3Dexp%3D1484496771~hmac%3D57be2ca2edda00a8d9ee1628c7904d860f9f10efac88137730c51e7e7ded07f9
+[MSG] playlist: open
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist newsong Banks%20Of%20The%20Ohio%20by%20David%20Grisman%20and%20Tony%20Rice%20from%20Tone%20Poems 12
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist album 12 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist album 12 Tone%20Poems
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist artist 12 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist artist 12 David%20Grisman%20and%20Tony%20Rice
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist duration 12 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist duration 12 142
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff time ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff time 0.110990098953247
