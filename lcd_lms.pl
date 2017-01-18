@@ -380,7 +380,6 @@ sub playlist {
 	my $cmd = shift;
 	switch ($cmd) {
 	case "clear"		{ clear_track; }
-#	case "stop"		{ clear_track; set_status $cmd; }
 	case "stop"		{ }
 	case "pause"		{ lms_query_send "mode"; }
 	case "title"		{ shift; set_title uri_unescape(shift); }
@@ -390,6 +389,7 @@ sub playlist {
 	case "tracks"		{ $total_tracks = int(shift); }
 	case "loadtracks"	{ lms_query_send "playlist tracks"; }
 	case "addtracks"	{ lms_query_send "playlist tracks"; }
+	case "load_done"	{ lms_query_send "playlist tracks"; }
 	case "index"		{ 
 		my $id = int(shift);
 		$current_track = $id + 1; 
