@@ -1,0 +1,80 @@
+[DEBUG] lms < player count ?
+[DEBUG] lms > player count 1
+[DEBUG] lms > 1
+[DEBUG] lms < player name 0 ?
+[DEBUG] lms > player name 0 LCDpi
+[DEBUG] lms > LCDpi
+[DEBUG] lms < player id 0 ?
+[DEBUG] lms > player id 0 b8%3A27%3Aeb%3Aed%3A76%3Aff
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff
+[DEBUG] lms < listen 1
+[DEBUG] lms > listen 1
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff mixer volume ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff mixer volume 70
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff mode ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff mode play
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist tracks ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist tracks 14
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist index ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist index 0
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist title 0 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist title 0 Us%20and%20Them
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist album 0 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist album 0 Portraits%20%26%20Perfumes
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist artist 0 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist artist 0 Anne%20Bisson
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist duration 0 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist duration 0 407
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff time ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff time 13.0156940689087
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist play wimp%3A%2F%2F19442760.flac
+[MSG] playlist: play
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist stop
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist jump 0  0
+[MSG] playlist: jump
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist load_done
+[MSG] playlist: load_done
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist open wimp%3A%2F%2F19442760.flac
+[MSG] playlist: open
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist open http%3A%2F%2F73.audio-pop.tidal.com%2F666243e1a851fe8526c9fe4dd9ebcced_26.flac%3F__token__%3Dexp%3D1484691277~hmac%3D0c254dd43f91cb4b86a8c8be614f7c9715bb85ddfedd6780a1d9393bf929ac70
+[MSG] playlist: open
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff newmetadata
+[MSG] unknown: [newmetadata]
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist newsong Little%20Black%20Lake%20by%20Anne%20Bisson%20from%20Blue%20Mind 0
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist album 0 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist album 0 Blue%20Mind
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist artist 0 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist artist 0 Anne%20Bisson
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist duration 0 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist duration 0 256
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff time ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff time 0.313447961807251
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist play http%3A%2F%2Fopml.radiotime.com%2FTune.ashx%3Fid%3Ds24040%26partnerId%3D16%26username%3Dhagensieker 88.5%20%7C%20WXPN%20(AAA)
+[MSG] playlist: play
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist stop
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist jump 0  0
+[MSG] playlist: jump
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist load_done
+[MSG] playlist: load_done
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff newmetadata
+[MSG] unknown: [newmetadata]
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist open http%3A%2F%2Fwxpnhi.streamguys.com%2Fxpnhi
+[MSG] playlist: open
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist open http%3A%2F%2Fwxpnhi.streamguys.com%2Fxpnhi
+[MSG] playlist: open
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist newsong %20Public%20Image%20Ltd.%20%20%20-%20%20Rise%20%20
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist title 0 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist title 0 %20Rise%20%20
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist artist 0 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist artist 0 %20Public%20Image%20Ltd.%20%20
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist newsong %20Dave%20Carter%20%26%20Tracy%20Grammer%20%20%20-%20%20Tanglewood%20Tree%20%20%20(XPN2%20-%20Icecast%20MP3%20High) 0
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist album 0 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist album 0
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist artist 0 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist artist 0 %20Public%20Image%20Ltd.%20%20
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff playlist duration 0 ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff playlist duration 0 0
+[DEBUG] lms < b8%3A27%3Aeb%3Aed%3A76%3Aff time ?
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff time 0.17437896156311
+[DEBUG] lms > b8%3A27%3Aeb%3Aed%3A76%3Aff newmetadata
+[MSG] unknown: [newmetadata]
