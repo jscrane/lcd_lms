@@ -411,6 +411,7 @@ sub playlist {
 			lms_query_send "playlist duration $id";
 			lms_query_send "time";
 		} else {
+			set_album "";
 			lms_query_send "playlist title 0";
 			lms_query_send "playlist artist 0";
 		}
