@@ -15,12 +15,13 @@ use Log::Message::Simple qw(debug msg);
 
 my $DEF_LCDD = "localhost";
 my $DEF_LCDPORT = "13666";
-
 my $DEF_LMS = "rpi";
 my $DEF_LMSPORT = "9090";
 
 my $width = 20;
 my $lines = 4;
+my $stop_key = "Enter";
+my $pause_key = "Down";
 
 my $progname = $0;
    $progname =~ s#.*/(.*?)$#$1#;
@@ -118,8 +119,8 @@ lcd_send_receive "widget_add $PLAYER volume string";
 lcd_send_receive "widget_add $PLAYER status string";
 lcd_send_receive "widget_add $PLAYER progress string";
 
-lcd_send_receive "client_add_key Enter";
-lcd_send_receive "client_add_key Down";
+lcd_send_receive "client_add_key $stop_key";
+lcd_send_receive "client_add_key $pause_key";
 
 lcd_send_receive "screen_add CLOCK";
 lcd_send_receive "screen_set CLOCK -priority info heartbeat off backlight off";
@@ -161,9 +162,9 @@ while () {
 			if ( $fh == $lms ) {
 				lms_response $input;
 			} elsif ( $fh == $lcd ) {
-				if ( $input eq "key Enter\n" ) {
-					lms_cmd_send "stop";
-				} elsif ( $input eq "key Down\n" ) {
+				if ( $input eq "key $stop_key\n" ) {
+					lms_cmd_send "playlist clear";
+				} elsif ( $input eq "key $pause_key\n" ) {
 					lms_cmd_send "pause";
 				}
 			}
@@ -380,7 +381,7 @@ sub playlist {
 	my $cmd = shift;
 	switch ($cmd) {
 	case "clear"		{ clear_track; }
-	case "stop"		{ }
+	case "stop"		{ lms_query_send "mode"; }
 	case "pause"		{ lms_query_send "mode"; }
 	case "title"		{ shift; set_title uri_unescape(shift); }
 	case "album"		{ shift; set_album uri_unescape(shift); }
