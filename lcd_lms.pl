@@ -29,9 +29,8 @@ my $progname = $0;
 sub error($@);
 sub send_receive;
 sub lcd_send_receive;
-sub lms_query;
-sub lms_query_send;
-sub lms_cmd_send;
+sub lms_send_receive;
+sub lms_send;
 sub lms_response;
 sub set_clock_widget;
 sub set_title;
@@ -72,11 +71,11 @@ my $lms = IO::Socket::INET->new(
 $lms->autoflush(1);
 
 my $player_id = "";
-my $pcount = lms_query "player count";
+my $pcount = lms_send_receive "player count";
 for (my $i = 0; $i < $pcount; $i++) {
-	my $p = lms_query "player name $i";
+	my $p = lms_send_receive "player name $i";
 	if ($p eq $PLAYER) {
-		$player_id = lms_query "player id $i";
+		$player_id = lms_send_receive "player id $i";
 		last;
 	}
 }
@@ -146,26 +145,26 @@ my $ans = send_receive $lms, "listen 1";
 chomp $ans;
 debug( "lms > $ans", $deb_lms );
 
-lms_query_send "mixer volume";
-lms_query_send "mode";
+lms_send "mixer volume ?";
+lms_send "mode ?";
 
 while () {
 	while (my @ready = $sel->can_read(1)) {
 		my $fh;
 		foreach $fh (@ready) {
 			my $input = <$fh>;
-			if (!defined $input) {
-				close ($lcd);
-				close ($lms);
+			if ( !defined $input ) {
+				close $lcd;
+				close $lms;
 				exit;
 			}
 			if ( $fh == $lms ) {
 				lms_response $input;
 			} elsif ( $fh == $lcd ) {
 				if ( $input eq "key $stop_key\n" ) {
-					lms_cmd_send "playlist clear";
+					lms_send "playlist clear";
 				} elsif ( $input eq "key $pause_key\n" ) {
-					lms_cmd_send "pause";
+					lms_send "pause";
 				}
 			}
 		}
@@ -214,7 +213,7 @@ sub lcd_send_receive {
 	return $res;
 }
 
-sub lms_query {
+sub lms_send_receive {
 	my $query = shift;
 
 	print $lms "$query ?\n";
@@ -231,24 +230,11 @@ sub lms_query {
 	}
 }
 
-sub lms_query_send {
-	my $query = shift;
-
-	print $lms "$player_id $query ?\n";
-	debug( "lms < $player_id $query ?", $deb_lms );
-
-	my $ans = <$lms>;
-	lms_response $ans;
-}
-
-sub lms_cmd_send {
+sub lms_send {
 	my $cmd = shift;
 
 	print $lms "$player_id $cmd\n";
 	debug( "lms < $player_id $cmd", $deb_lms );
-
-	my $ans = <$lms>;
-	lms_response $ans;
 }
 
 sub centre {
@@ -381,25 +367,25 @@ sub playlist {
 	my $cmd = shift;
 	switch ($cmd) {
 	case "clear"		{ clear_track; }
-	case "stop"		{ lms_query_send "mode"; }
-	case "pause"		{ lms_query_send "mode"; }
+	case "stop"		{ lms_send "mode ?"; }
+	case "pause"		{ lms_send "mode ?"; }
 	case "title"		{ shift; set_title uri_unescape(shift); }
 	case "album"		{ shift; set_album uri_unescape(shift); }
 	case "artist"		{ shift; set_artist uri_unescape(shift); }
 	case "duration"		{ shift; $current_duration = shift; set_elapsed_time; }
 	case "tracks"		{ $total_tracks = int(shift); }
-	case "loadtracks"	{ lms_query_send "playlist tracks"; }
-	case "addtracks"	{ lms_query_send "playlist tracks"; }
-	case "load_done"	{ lms_query_send "playlist tracks"; }
+	case "loadtracks"	{ lms_send "playlist tracks ?"; }
+	case "addtracks"	{ lms_send "playlist tracks ?"; }
+	case "load_done"	{ lms_send "playlist tracks ?"; }
 	case "index"		{ 
 		my $id = int(shift);
 		$current_track = $id + 1; 
 		set_progress;
-		lms_query_send "playlist title $id";
-		lms_query_send "playlist album $id";
-		lms_query_send "playlist artist $id";
-		lms_query_send "playlist duration $id";
-		lms_query_send "time";
+		lms_send "playlist title $id ?";
+		lms_send "playlist album $id ?";
+		lms_send "playlist artist $id ?";
+		lms_send "playlist duration $id ?";
+		lms_send "time ?";
 	}
 	case "newsong"		{ 
 		my $t = uri_unescape(shift);
@@ -407,14 +393,14 @@ sub playlist {
 		if (defined $id) { 
 			set_title $t;
 			$current_track = $id + 1; 
-			lms_query_send "playlist album $id";
-			lms_query_send "playlist artist $id";
-			lms_query_send "playlist duration $id";
-			lms_query_send "time";
+			lms_send "playlist album $id ?";
+			lms_send "playlist artist $id ?";
+			lms_send "playlist duration $id ?";
+			lms_send "time ?";
 		} else {
 			set_album "";
-			lms_query_send "playlist title 0";
-			lms_query_send "playlist artist 0";
+			lms_send "playlist title 0 ?";
+			lms_send "playlist artist 0 ?";
 		}
 		set_progress;
 		set_playing 1;
@@ -439,8 +425,8 @@ sub mode {
 	case "play"	{ 
 		set_playing 1;
 		set_status $cmd; 
-		lms_query_send "playlist tracks"; 
-		lms_query_send "playlist index"; 
+		lms_send "playlist tracks ?"; 
+		lms_send "playlist index ?"; 
 	}
 	else		{ msg( "mode: $cmd", $deb_lms ); }
 	}
@@ -467,8 +453,8 @@ sub lms_response {
 		case "mixer" 	{ shift @s; mixer @s; }
 		case "mode" 	{ shift @s; mode @s; }
 		case "time"	{ set_time $s[1]; }
-		case "play"	{}
-		case "pause"	{}
+		case "play"	{ lms_send "mode ?"; }
+		case "pause"	{ lms_send "mode ?"; }
 		else		{ msg( "unknown: [$r]", $deb_lms ); }
 		}
 	}
