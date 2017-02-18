@@ -162,7 +162,7 @@ while () {
 				lms_response $input;
 			} elsif ( $fh == $lcd ) {
 				if ( $input eq "key $stop_key\n" ) {
-					lms_send "playlist clear";
+					lms_send "playlist index +1";
 				} elsif ( $input eq "key $pause_key\n" ) {
 					lms_send "pause";
 				}
@@ -378,8 +378,15 @@ sub playlist {
 	case "addtracks"	{ lms_send "playlist tracks ?"; }
 	case "load_done"	{ lms_send "playlist tracks ?"; }
 	case "index"		{ 
-		my $id = int(shift);
-		$current_track = $id + 1; 
+		my $a = uri_unescape(shift);
+		my $id;
+		if ( $a eq "+1" ) { 
+			$id = $current_track;
+			$current_track++; 
+		} else {
+			$id = int($a);
+			$current_track = $id + 1; 
+		}
 		set_progress;
 		lms_send "playlist title $id ?";
 		lms_send "playlist album $id ?";
