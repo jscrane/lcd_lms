@@ -245,10 +245,16 @@ sub centre {
 	return sprintf("% *s", ($l + $w) / 2, $t);
 }
 
+sub trim {
+	my $s = shift;
+	$s =~ s/^\s+|\s+$//g;
+	return $s;
+}
+
 sub set_title {
-	my $title = shift;
+	$title = shift;
 	$title = "" if (!defined $title);
-	$title = centre($width, $title);
+	$title = centre($width, trim($title));
 	lcd_send_receive "widget_set $PLAYER title 1 1 $width 1 v 8 \"$title\"";
 }
 
@@ -258,7 +264,7 @@ sub set_album {
 	# its field to part of the name of the stream.
 	$album = "" if (!defined $album);
 	if ($album ne "") {
-		$album = centre($width, $album);
+		$album = centre($width, trim($album));
 	} elsif (length($title) > $width) {
 		my $pos = rindex($title, ' ', $width);
 		if ($pos > 0) {
@@ -282,7 +288,7 @@ sub set_artist {
 			$artist = substr($artist, $pos + 1);
 		}
 	}
-	$artist = centre($width, $artist);
+	$artist = centre($width, trim($artist));
 	lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 v 8 \"$artist\"";
 }
 
@@ -392,7 +398,7 @@ sub playlist {
 			$id = $current_track;
 			$current_track++; 
 		} else {
-			lms_send "playlist clear";
+			lms_send "stop";
 			return;
 		}
 		set_progress;
