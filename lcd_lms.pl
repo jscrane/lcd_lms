@@ -302,9 +302,14 @@ sub set_progress {
 
 sub set_elapsed_time {
 	# duration is unknown for radio stream so just show elapsed time
-	my $remain = $current_duration - $elapsed_time;
-	if ($remain < 0) {
-		$remain = - $remain;
+	my $remain;
+	if (defined($current_duration)) {
+		$remain = $current_duration - $elapsed_time;
+		if ($remain < 0) {
+			$remain = -$remain;
+		}
+	} else {
+		$remain = $elapsed_time;
 	}
 	my $rh = int($remain / 3600);
 	my $rm = int(($remain - 3600 * $rh) / 60);
@@ -380,12 +385,15 @@ sub playlist {
 	case "index"		{ 
 		my $a = uri_unescape(shift);
 		my $id;
-		if ( $a eq "+1" ) { 
+		if ( $a ne "+1" ) {
+			$id = int($a);
+			$current_track = $id + 1;
+		} elsif ( $current_track < $total_tracks ) {
 			$id = $current_track;
 			$current_track++; 
 		} else {
-			$id = int($a);
-			$current_track = $id + 1; 
+			lms_send "playlist clear";
+			return;
 		}
 		set_progress;
 		lms_send "playlist title $id ?";
