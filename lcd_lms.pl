@@ -114,6 +114,7 @@ lcd_send_receive "screen_set $PLAYER priority foreground name playback heartbeat
 lcd_send_receive "widget_add $PLAYER title scroller";
 lcd_send_receive "widget_add $PLAYER album scroller";
 lcd_send_receive "widget_add $PLAYER artist scroller";
+lcd_send_receive "widget_add $PLAYER stream scroller";
 lcd_send_receive "widget_add $PLAYER volume string";
 lcd_send_receive "widget_add $PLAYER status string";
 lcd_send_receive "widget_add $PLAYER progress string";
@@ -253,42 +254,68 @@ sub trim {
 
 sub set_title {
 	$title = shift;
-	$title = "" if (!defined $title);
-	$title = centre($width, trim($title));
-	lcd_send_receive "widget_set $PLAYER title 1 1 $width 1 v 8 \"$title\"";
+	$title = (!defined $title)? "": trim($title);
 }
 
 sub set_album {
 	$album = shift;
-	# if album is undefined (as it is for radio streams) give
-	# its field to part of the name of the stream.
-	$album = "" if (!defined $album);
-	if ($album ne "") {
-		$album = centre($width, trim($album));
-	} elsif (length($title) > $width) {
-		my $pos = rindex($title, ' ', $width);
-		if ($pos > 0) {
-			$album = centre($width, substr($title, $pos + 1));
-			set_title substr($title, 0, $pos);
+	$album = (!defined $album)? "": trim($album);
+}
+
+sub multiline {
+	my $s = shift;
+	my $t = "";
+	my $l = "";
+	my $len = 0;
+	foreach ( split(' ', $s) ) {
+		my $w = $_;
+		my $n = length($w);
+		if ($n + $len < $width) {
+			if ($len > 0) {
+				$l = "$l $w";
+				$len += $n + 1;
+			} else {
+				$l = $w;
+				$len = $n;
+			}
+		} else {
+			$t = $t . $l . (' ' x ($width - $len));
+			$l = $w;
+			$len = $n;
 		}
 	}
-	lcd_send_receive "widget_set $PLAYER album 1 2 $width 2 v 8 \"$album\"";
+	return $t . $l;
 }
 
 sub set_artist {
 	$artist = shift;
-	$artist = "" if (!defined $artist);
-	my $n = length($artist);
-	# if artist and album are the same, and too long for the display,
-	# break them up nicely
-	if ($n > $width && ($artist eq $album || $album eq "")) {
-		my $pos = rindex($artist, ' ', $width);
-		if ($pos > 0) {
-			set_album substr($artist, 0, $pos);
-			$artist = substr($artist, $pos + 1);
+	$artist = (!defined $artist)? "": trim($artist);
+
+	if (length($album) == 0) {
+		if (length($title) >= $width && length($artist) >= $width) {
+			my $s = multiline("$title $artist");
+			lcd_send_receive "widget_set $PLAYER stream 1 1 $width 3 v 8 \"$s\"";
+			return;
+		} 
+		if (length($title) >= $width) {
+			my $p = rindex($title, ' ', $width);
+			if ($p > 0) {
+				$album = substr($title, $p + 1);
+				$title = substr($title, 0, $p);
+			}
+		} elsif (length($artist) >= $width) {
+			my $p = rindex($artist, ' ', $width);
+			if ($p > 0) {
+				$album = substr($artist, 0, $p);
+				$artist = substr($artist, $p + 1);
+			}
 		}
 	}
-	$artist = centre($width, trim($artist));
+	$title = centre($width, $title);
+	lcd_send_receive "widget_set $PLAYER title 1 1 $width 1 v 8 \"$title\"";
+	$album = centre($width, $album);
+	lcd_send_receive "widget_set $PLAYER album 1 2 $width 2 v 8 \"$album\"";
+	$artist = centre($width, $artist);
 	lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 v 8 \"$artist\"";
 }
 
@@ -412,8 +439,8 @@ sub playlist {
 		my $t = uri_unescape(shift);
 		my $id = shift;
 		if (defined $id) { 
-			set_title $t;
 			$current_track = $id + 1; 
+			lms_send "playlist title $id ?";
 			lms_send "playlist album $id ?";
 			lms_send "playlist artist $id ?";
 			lms_send "playlist duration $id ?";
