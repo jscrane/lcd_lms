@@ -262,6 +262,7 @@ sub set_album {
 	$album = (!defined $album)? "": trim($album);
 }
 
+# FIXME: centre lines?
 sub multiline {
 	my $s = shift;
 	my $t = "";
@@ -297,6 +298,7 @@ sub set_artist {
 			lcd_send_receive "widget_set $PLAYER stream 1 1 $width 3 v 8 \"$s\"";
 			return;
 		} 
+		# FIXME: use multiline?
 		if (length($title) >= $width) {
 			my $p = rindex($title, ' ', $width);
 			if ($p > 0) {
@@ -395,11 +397,6 @@ sub clear_track {
 	set_playing 0;
 	set_progress;
 }
-
-sub playlist;
-sub prefset;
-sub mixer;
-sub mode;
 
 sub playlist {
 	my $cmd = shift;
