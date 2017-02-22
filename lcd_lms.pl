@@ -293,33 +293,17 @@ sub set_artist {
 	$artist = shift;
 	$artist = (!defined $artist)? "": trim($artist);
 
-	if (length($album) == 0) {
-		if (length($title) >= $width && length($artist) >= $width) {
-			my $s = multiline("$title $artist");
-			lcd_send_receive "widget_set $PLAYER stream 1 1 $width 3 v 8 \"$s\"";
-			return;
-		} 
-		# FIXME: use multiline?
-		if (length($title) >= $width) {
-			my $p = rindex($title, ' ', $width);
-			if ($p > 0) {
-				$album = substr($title, $p + 1);
-				$title = substr($title, 0, $p);
-			}
-		} elsif (length($artist) >= $width) {
-			my $p = rindex($artist, ' ', $width);
-			if ($p > 0) {
-				$album = substr($artist, 0, $p);
-				$artist = substr($artist, $p + 1);
-			}
-		}
-	}
 	$title = centre($width, $title);
-	lcd_send_receive "widget_set $PLAYER title 1 1 $width 1 v 8 \"$title\"";
-	$album = centre($width, $album);
-	lcd_send_receive "widget_set $PLAYER album 1 2 $width 2 v 8 \"$album\"";
 	$artist = centre($width, $artist);
-	lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 v 8 \"$artist\"";
+	if (length($album) == 0) {
+		my $s = multiline("$title $artist");
+		lcd_send_receive "widget_set $PLAYER stream 1 1 $width 3 v 8 \"$s\"";
+	} else {
+		$album = centre($width, $album);
+		lcd_send_receive "widget_set $PLAYER title 1 1 $width 1 h 3 \"$title\"";
+		lcd_send_receive "widget_set $PLAYER album 1 2 $width 2 h 3 \"$album\"";
+		lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 h 3 \"$artist\"";
+	}
 }
 
 sub set_status {
