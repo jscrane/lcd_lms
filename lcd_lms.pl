@@ -243,7 +243,9 @@ sub centre {
 	my $t = shift;
 	my $l = length($t);
 	return $t if ($l > $w);
-	return sprintf("% *s", ($l + $w) / 2, $t);
+	my $a = int(($w - $l) / 2);
+	my $b = $w - $l - $a;
+	return (' ' x $a) . $t . (' ' x $b);
 }
 
 sub trim {
@@ -262,7 +264,6 @@ sub set_album {
 	$album = (!defined $album)? "": trim($album);
 }
 
-# FIXME: centre lines?
 sub multiline {
 	my $s = shift;
 	my $t = "";
@@ -280,12 +281,12 @@ sub multiline {
 				$len = $n;
 			}
 		} else {
-			$t = $t . $l . (' ' x ($width - $len));
+			$t = $t . centre($width, $l);
 			$l = $w;
 			$len = $n;
 		}
 	}
-	return $t . $l;
+	return $t . centre($width, $l);
 }
 
 sub set_artist {
