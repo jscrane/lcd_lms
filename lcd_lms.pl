@@ -317,8 +317,8 @@ sub set_artist {
 	my $a = centre($width, $artist);
 	my $l = centre($width, $album);
 	lcd_send_receive "widget_set $PLAYER title 1 1 $width 1 h 3 \"$t\"";
-	lcd_send_receive "widget_set $PLAYER album 1 2 $width 2 h 3 \"$a\"";
-	lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 h 3 \"$l\"";
+	lcd_send_receive "widget_set $PLAYER album 1 2 $width 2 h 3 \"$l\"";
+	lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 h 3 \"$a\"";
 }
 
 sub set_status {
