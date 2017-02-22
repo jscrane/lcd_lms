@@ -114,7 +114,6 @@ lcd_send_receive "screen_set $PLAYER priority foreground name playback heartbeat
 lcd_send_receive "widget_add $PLAYER title scroller";
 lcd_send_receive "widget_add $PLAYER album scroller";
 lcd_send_receive "widget_add $PLAYER artist scroller";
-lcd_send_receive "widget_add $PLAYER stream scroller";
 lcd_send_receive "widget_add $PLAYER volume string";
 lcd_send_receive "widget_add $PLAYER status string";
 lcd_send_receive "widget_add $PLAYER progress string";
@@ -293,17 +292,33 @@ sub set_artist {
 	$artist = shift;
 	$artist = (!defined $artist)? "": trim($artist);
 
-	$title = centre($width, $title);
-	$artist = centre($width, $artist);
 	if (length($album) == 0) {
-		my $s = multiline("$title $artist");
-		lcd_send_receive "widget_set $PLAYER stream 1 1 $width 3 v 8 \"$s\"";
-	} else {
-		$album = centre($width, $album);
-		lcd_send_receive "widget_set $PLAYER title 1 1 $width 1 h 3 \"$title\"";
-		lcd_send_receive "widget_set $PLAYER album 1 2 $width 2 h 3 \"$album\"";
-		lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 h 3 \"$artist\"";
+		if (length($title) >= $width && length($artist) >= $width) {
+			my $s = multiline("$title $artist");
+			lcd_send_receive "widget_set $PLAYER title 1 1 $width 3 v 8 \"$s\"";
+			return;
+		} 
+		if (length($title) >= $width) {
+			my $t = multiline($title);
+			lcd_send_receive "widget_set $PLAYER title 1 1 $width 2 v 8 \"$t\"";
+			my $a = centre($width, $artist);
+			lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 h 3 \"$a\"";
+			return;
+		}
+		if (length($artist) >= $width) {
+			my $t = centre($width, $title);
+			lcd_send_receive "widget_set $PLAYER title 1 1 $width 1 h 3 \"$t\"";
+			my $a = multiline($artist);
+			lcd_send_receive "widget_set $PLAYER artist 1 2 $width 3 v 8 \"$a\"";
+			return;
+		}
 	}
+	my $t = centre($width, $title);
+	my $a = centre($width, $artist);
+	my $l = centre($width, $album);
+	lcd_send_receive "widget_set $PLAYER title 1 1 $width 1 h 3 \"$t\"";
+	lcd_send_receive "widget_set $PLAYER album 1 2 $width 2 h 3 \"$a\"";
+	lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 h 3 \"$l\"";
 }
 
 sub set_status {
