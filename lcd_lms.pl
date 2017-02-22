@@ -235,6 +235,9 @@ sub lms_send {
 
 	print $lms "$player_id $cmd\n";
 	debug( "lms < $player_id $cmd", $deb_lms );
+
+	my $ans = <$lms>;
+	lms_response $ans;
 }
 
 sub centre {
@@ -293,8 +296,10 @@ sub set_artist {
 	$artist = (!defined $artist)? "": trim($artist);
 
 	if (length($album) == 0) {
+		lcd_send_receive "widget_set $PLAYER album 1 2 $width 2 h 3 \"\"";
 		if (length($title) >= $width && length($artist) >= $width) {
 			my $s = multiline("$title $artist");
+			lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 h 3 \"\"";
 			lcd_send_receive "widget_set $PLAYER title 1 1 $width 3 v 8 \"$s\"";
 			return;
 		} 
