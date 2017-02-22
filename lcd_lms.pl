@@ -377,7 +377,7 @@ sub set_playing {
 	$playing = shift;
 	if ($playing == 0) {
 		lcd_send_receive "screen_set $PLAYER priority background backlight off";
-		if ($current_duration > 0) {
+		if (defined($current_duration) && $current_duration > 0) {
 			$current_duration -= $elapsed_time;
 			$elapsed_time = 0;
 		}
