@@ -253,6 +253,7 @@ sub centre {
 sub trim {
 	my $s = shift;
 	$s =~ s/^\s+|\s+$//g;
+	$s =~ tr/"'//d;
 	return $s;
 }
 
