@@ -253,7 +253,7 @@ sub centre {
 sub trim {
 	my $s = shift;
 	$s =~ s/^\s+|\s+$//g;
-	$s =~ tr/"'//d;
+	$s =~ tr/"//d;
 	return $s;
 }
 
@@ -450,8 +450,9 @@ sub playlist {
 			lms_send "time ?";
 		} else {
 			set_album "";
-			lms_send "playlist title 0 ?";
-			lms_send "playlist artist 0 ?";
+			$id = $current_track - 1;
+			lms_send "playlist title $id ?";
+			lms_send "playlist artist $id ?";
 		}
 		set_progress;
 		set_playing 1;
