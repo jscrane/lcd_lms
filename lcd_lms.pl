@@ -520,3 +520,78 @@ sub set_clock_widget {
         send_receive $lcd, "widget_set CLOCK $w 1 $l \"$s\"";
 }
 
+=pod
+
+=head1 NAME
+
+lcd_lms - Gets playlist information from Logitech Media Server and sends it
+to LCDproc.
+
+=head1 SYNOPSIS
+
+B<lcd_lms.pl> [OPTIONS] I<Player Name>
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-v [all | lms | lcd]>
+
+Enable debugging of: everything, the LMS protocol or the LCDproc protocol.
+
+=item B<-d lcd-server[:lcd-port]>
+
+Set the host and port for the LCDproc server. (Default 'localhost' and
+13666.)
+
+=item B<-l lms-server[:lms-port]>
+
+Set the host and port for the LMS server. (Default 'rpi' and 9090.)
+
+=item B<Player Name>
+
+The LMS player name.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Cannot connect to LMS server at rpi:9090
+
+By default lcd_lms tries to connect to LMS running on host I<rpi> and 
+port 9090.  Change the host and port where LMS is running using the 
+B<-l> option above.
+
+=item Cannot connect to LCDd daemon at localhost:13066
+
+By default lcd_lms tries to connect to the LCDproc server running
+on host I<localhost> and port 13066. Change the host and port where
+LCDproc is running using the B<-d> option above.
+
+=item Unable to find player I<Player Name>
+
+lcd_lms is unable to find the specified player on the LMS server
+specified. Debugging the LMS protocol using the B<-v lms> option
+will show a list of available players.
+
+=back
+
+=head1 REQUIRES
+
+Perl 5.005, Getopt::Std, Log::Message::Simple;
+
+All available on CPAN: http://www.cpan.org/
+
+=head1 BUGS
+
+Please report any bugs, or request features, on the Issue Tracker at the
+website below.
+
+=head1 WEBSITE
+
+See B<https://github.com/jscrane/lcd_lms> for the latest version.
+
+=cut
+
