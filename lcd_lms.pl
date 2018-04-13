@@ -162,7 +162,11 @@ while () {
 				lms_response $input;
 			} elsif ( $fh == $lcd ) {
 				if ( $input eq "key $stop_key\n" ) {
-					lms_send "playlist index +1";
+					if ($playing) {
+						lms_send "playlist index +1";
+					} else {
+						lms_send "playlist clear";
+					}
 				} elsif ( $input eq "key $pause_key\n" ) {
 					lms_send "pause";
 				}
