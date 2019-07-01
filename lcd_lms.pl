@@ -308,6 +308,11 @@ sub set_artist {
 			lcd_send_receive "widget_set $PLAYER title 1 1 $width 3 v 8 \"$s\"";
 			return;
 		} 
+		if (length($title) >= $width && length($artist) == 0) {
+			my $t = multiline($title);
+			lcd_send_receive "widget_set $PLAYER title 1 1 $width 3 v 8 \"$t\"";
+			return;
+		}
 		if (length($title) >= $width) {
 			my $t = multiline($title);
 			lcd_send_receive "widget_set $PLAYER title 1 1 $width 2 v 8 \"$t\"";
@@ -418,7 +423,7 @@ sub playlist {
 	case "album"		{ shift; set_album uri_unescape(shift); }
 	case "artist"		{ shift; set_artist uri_unescape(shift); }
 	case "duration"		{ shift; $current_duration = shift; set_elapsed_time; }
-	case "tracks"		{ $total_tracks = int(shift); }
+	case "tracks"		{ $total_tracks = int(shift); set_progress; }
 	case "loadtracks"	{ lms_send "playlist tracks ?"; }
 	case "addtracks"	{ lms_send "playlist tracks ?"; }
 	case "load_done"	{ lms_send "playlist tracks ?"; }
