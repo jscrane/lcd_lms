@@ -1,5 +1,5 @@
 # lcd_lms
-Script to glue the Logitect Media Server 
+Script to glue the Logitech Media Server 
 [command-line](http://wiki.slimdevices.com/index.php/Logitech_Media_Server_CLI) to LCDd.
 
 See it in [action](https://programmablehardware.blogspot.ie/2013/06/squeezeplug-lcd.html).
