@@ -1,0 +1,39 @@
+[DEBUG] lms < player count ?
+[DEBUG] lms > player count 1
+[DEBUG] lms > 1
+[DEBUG] lms < player name 0 ?
+[DEBUG] lms > player name 0 SqueezeLite
+[DEBUG] lms > SqueezeLite
+[DEBUG] lms < player id 0 ?
+[DEBUG] lms > player id 0 b8%3A27%3Aeb%3A75%3Aa2%3A23
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23
+[DEBUG] lms < listen 1
+[DEBUG] lms > listen 1
+[DEBUG] lms < b8%3A27%3Aeb%3A75%3Aa2%3A23 mixer volume ?
+[DEBUG] lms < b8%3A27%3Aeb%3A75%3Aa2%3A23 mode ?
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 mixer volume 68
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 mode stop
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 playlist play iplayer%3A%2F%2Faod%3Fhls%3Dhttp%3A%2F%2Fopen.live.bbc.co.uk%2Fmediaselector%2F5%2Fredir%2Fversion%2F2.0%2Fvpid%2Fb08f4sl2%2Fmediaset%2Faudio-syndication%2Fproto%2Fhttp%26dash%3Dhttp%3A%2F%2Fopen.live.bbc.co.uk%2Fmediaselector%2F5%2Fredir%2Fversion%2F2.0%2Fmediaset%2Faudio-syndication-dash%2Fproto%2Fhttp%2Fvpid%2Fb08f4sl2%26dur%3D1800%26icon%3Dhttp%3A%2F%2Fichef.bbci.co.uk%2Fimages%2Fic%2F512x288%2Fp01lyfvp.jpg%26title%3DAnd%2520The%2520Academy%2520Award%2520Goes%2520To%2520...%253A%2520Series%25207%253A%2520All%2520About%2520Eve%26desc%3DThe%2520first%2520film%2520to%2520get%252014%2520Oscar%2520nominations%2520-%2520Paul%2520Gambaccini%2520on%2520the%2520bitchiest%2520movie%2520ever. And%20The%20Academy%20Award%20Goes%20To%20... 
+[MSG] playlist: play
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 playlist jump 0  0 
+[MSG] playlist: jump
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 playlist open hls%3A%2F%2Fopen.live.bbc.co.uk%2Fmediaselector%2F5%2Fredir%2Fversion%2F2.0%2Fvpid%2Fb08f4sl2%2Fmediaset%2Faudio-syndication%2Fproto%2Fhttp%7C
+[MSG] playlist: open
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 playlist open hls%3A%2F%2Fopen.live.bbc.co.uk%2Fmediaselector%2F5%2Fredir%2Fversion%2F2.0%2Fvpid%2Fb08f4sl2%2Fmediaset%2Faudio-syndication%2Fproto%2Fhttp%7C
+[MSG] playlist: open
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 playlist load_done
+[DEBUG] lms < b8%3A27%3Aeb%3A75%3Aa2%3A23 playlist tracks ?
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 prefset server currentSong 0
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 playlist tracks 1
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 playlist newsong And%20The%20Academy%20Award%20Goes%20To%20...%3A%20Series%207%3A%20All%20About%20Eve 0
+[DEBUG] lms < b8%3A27%3Aeb%3A75%3Aa2%3A23 playlist title 0 ?
+[DEBUG] lms < b8%3A27%3Aeb%3A75%3Aa2%3A23 playlist album 0 ?
+[DEBUG] lms < b8%3A27%3Aeb%3A75%3Aa2%3A23 playlist artist 0 ?
+[DEBUG] lms < b8%3A27%3Aeb%3A75%3Aa2%3A23 playlist duration 0 ?
+[DEBUG] lms < b8%3A27%3Aeb%3A75%3Aa2%3A23 time ?
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 playlist title 0 And%20The%20Academy%20Award%20Goes%20To%20...%3A%20Series%207%3A%20All%20About%20Eve
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 playlist album 0
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 playlist artist 0 The%20first%20film%20to%20get%2014%20Oscar%20nominations%20-%20Paul%20Gambaccini%20on%20the%20bitchiest%20movie%20ever.
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 playlist duration 0 1800
+[DEBUG] lms > b8%3A27%3Aeb%3A75%3Aa2%3A23 time 0
+[DEBUG] lms < listen 1
