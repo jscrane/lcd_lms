@@ -88,7 +88,7 @@ my $lcd = IO::Socket::INET->new(
 		PeerPort  => $LCDPORT,
 	) or error(1, "cannot connect to LCDd daemon at $LCDD:$LCDPORT");
 
-# Make sure our messages get there right away
+STDOUT->autoflush(1);
 $lcd->autoflush(1);
 
 my $read_set = new IO::Select();
