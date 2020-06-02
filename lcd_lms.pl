@@ -42,7 +42,7 @@ sub set_volume;
 sub HELP_MESSAGE;
 
 my %opt = ();
-getopts("d:l:v:", \%opt);
+getopts("d:l:v:m", \%opt);
 
 my ($dh, $dp) = split(/:/, $opt{d}) if (defined($opt{d}));
 my $LCDD = (defined($dh) && $dh ne '')? $dh: $DEF_LCDD;
@@ -55,6 +55,7 @@ my $LMSPORT = (defined($lp) && $lp ne '')? $lp: $DEF_LMSPORT;
 my $deb_all = defined($opt{v}) ? $opt{v} eq 'all': 0;
 my $deb_lcd = $deb_all || (defined($opt{v}) ? $opt{v} eq 'lcd': 0);
 my $deb_lms = $deb_all || (defined($opt{v}) ? $opt{v} eq 'lms': 0);
+my $charmap = defined($opt{m});
 
 if ( $#ARGV != 0 ) {
 	HELP_MESSAGE;
@@ -258,6 +259,23 @@ sub trim {
 	my $s = shift;
 	$s =~ s/^\s+|\s+$//g;
 	$s =~ tr/"//d;
+	if ($charmap) {
+		my $t = '';
+		for ( my $i = 0; $i < length($s); $i++ ) {
+			my $c = substr( $s, $i, 1 );
+			my $o = ord( $c );
+			if ($o == 0xc2) {
+				$i++;
+			} elsif ($o == 0xc3) {
+				$i++;
+				$o = ord( substr( $s, $i, 1 ) );
+				$t .= chr( ($o % 0x100) + 0x40 );
+			} else {
+				$t .= $c;
+			}
+		}
+		$s = $t;
+	}
 	return $s;
 }
 
