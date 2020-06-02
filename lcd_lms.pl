@@ -259,6 +259,9 @@ sub trim {
 	my $s = shift;
 	$s =~ s/^\s+|\s+$//g;
 	$s =~ tr/"//d;
+
+	# see https://www.i18nqa.com/debug/utf8-debug.html and
+	# table 4: http://fab.cba.mit.edu/classes/863.06/11.13/44780.pdf
 	if ($charmap) {
 		my $t = '';
 		for ( my $i = 0; $i < length($s); $i++ ) {
