@@ -4,6 +4,16 @@ Script to glue the Logitech Media Server
 
 See it in [action](https://programmablehardware.blogspot.ie/2013/06/squeezeplug-lcd.html).
 
+## Running it
+Put it in `/usr/local/bin`. Run it from `/etc/rc.local` as follows:
+
+```
+(while true; do
+  /usr/local/bin/lcd_lms.pl -m SqueezeLite
+  sleep 30
+done) &
+```
+
 ## Example:
 Connect to LCDd (on host/port _lcdserver_, _lcdport_) and 
 the player _Squeezelite_ (on host/port _lmsserver_, _lmsport_) 
