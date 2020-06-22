@@ -4,6 +4,12 @@ Script to glue the Logitech Media Server
 
 See it in [action](https://programmablehardware.blogspot.ie/2013/06/squeezeplug-lcd.html).
 
+## Requirements
+
+```
+$ sudo apt install libswitch-perl liblog-message-simple-perl
+```
+
 ## Running it
 Put it in `/usr/local/bin`. Run it from `/etc/rc.local` as follows:
 
