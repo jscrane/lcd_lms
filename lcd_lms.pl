@@ -576,7 +576,7 @@ Set the host and port for the LCDproc server. (Default 'localhost' and
 
 =item B<-l lms-server[:lms-port]>
 
-Set the host and port for the LMS server. (Default 'rpi' and 9090.)
+Set the host and port for the LMS server. (Default 'localhost' and 9090.)
 
 =item B<Player Name>
 
@@ -588,9 +588,9 @@ The LMS player name.
 
 =over 4
 
-=item Cannot connect to LMS server at rpi:9090
+=item Cannot connect to LMS server at localhost:9090
 
-By default lcd_lms tries to connect to LMS running on host I<rpi> and 
+By default lcd_lms tries to connect to LMS running on host I<localhost> and
 port 9090.  Change the host and port where LMS is running using the 
 B<-l> option above.
 
