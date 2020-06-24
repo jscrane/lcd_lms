@@ -15,7 +15,7 @@ use Log::Message::Simple qw(debug msg);
 
 my $DEF_LCDD = "localhost";
 my $DEF_LCDPORT = "13666";
-my $DEF_LMS = "rpi";
+my $DEF_LMS = "localhost";
 my $DEF_LMSPORT = "9090";
 
 my $width = 20;
