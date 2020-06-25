@@ -7,7 +7,7 @@ See it in [action](https://programmablehardware.blogspot.ie/2013/06/squeezeplug-
 ## Requirements
 
 ```
-$ sudo apt install libswitch-perl liblog-message-simple-perl
+# apt install libswitch-perl liblog-message-simple-perl
 ```
 
 ## Running it
@@ -18,6 +18,15 @@ Put it in `/usr/local/bin`. Run it from `/etc/rc.local` as follows:
   /usr/local/bin/lcd_lms.pl -m SqueezeLite
   sleep 30
 done) &
+```
+
+Or, if you have `systemd`:
+
+```
+# cp lcd_lms.service /etc/systemd/system
+# systemctl daemon-reload
+# systemctl enable lcd_lms.service
+# systemctl start lcd_lms.service
 ```
 
 ## Example:
