@@ -273,6 +273,21 @@ sub trim {
 				$i++;
 				$o = ord( substr( $s, $i, 1 ) );
 				$t .= chr( ($o % 0x100) + 0x40 );
+			} elsif ($o == 0xe2) {
+				$i++;
+				$o = ord( substr( $s, $i, 1 ) );
+				$i++;
+				if ($o == 0x80) {
+					$o = ord( substr( $s, $i, 1 ) );
+					switch($o) {
+					case 0x98 { $t .= "`" }
+					case 0x99 { $t .= "'" }
+					case 0x9c { $t .= "\"" }
+					case 0x9d { $t .= "\"" }
+					case 0xb9 { $t .= "<" }
+					case 0xba { $t .= ">" }
+					}
+				}
 			} else {
 				$t .= $c;
 			}
