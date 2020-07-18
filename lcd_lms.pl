@@ -592,6 +592,11 @@ Set the host and port for the LCDproc server. (Default 'localhost' and
 
 Set the host and port for the LMS server. (Default 'localhost' and 9090.)
 
+=item B<-m>
+
+Perform crude UTF-8 character mapping to display "special" characters properly
+on, e.g., HD44780 displays.
+
 =item B<Player Name>
 
 The LMS player name.
