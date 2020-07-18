@@ -492,7 +492,6 @@ sub playlist {
 			lms_send "playlist album $id ?";
 			lms_send "playlist artist $id ?";
 			lms_send "playlist duration $id ?";
-			lms_send "time ?";
 		} else {
 			set_album "";
 			$id = $current_track - 1;
