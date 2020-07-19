@@ -219,27 +219,24 @@ sub lcd_send_receive {
 }
 
 sub lms_send_receive {
-	my $query = shift;
-
-	print $lms "$query ?\n";
-	debug( "lms < $query ?", $deb_lms );
+	my $query = shift . " ?";
+	print $lms "$query\n";
+	debug("lms < " . uri_unescape($query), $deb_lms);
 
 	while () {
 		my $ans = <$lms>;
 		chomp $ans;
-		debug( "lms > $ans", $deb_lms );
+		debug("lms > " . uri_unescape($ans), $deb_lms);
 		if ($ans =~ /^$query (.+)/) {
-			debug( "lms > $1", $deb_lms );
 			return $1;
 		}
 	}
 }
 
 sub lms_send {
-	my $cmd = shift;
-
-	print $lms "$player_id $cmd\n";
-	debug( "lms < $player_id $cmd", $deb_lms );
+	my $cmd = "$player_id " . shift;
+	print $lms "$cmd\n";
+	debug("lms < " . uri_unescape($cmd), $deb_lms);
 
 	my $ans = <$lms>;
 	lms_response $ans;
@@ -539,7 +536,7 @@ sub prefset {
 sub lms_response {
 	my $input = shift;
 	chomp $input;
-	debug( "lms > $input", $deb_lms );
+	debug("lms > " . uri_unescape($input), $deb_lms);
 	if ( $input =~ /$player_id (.+)/ ) {
 		my $r = $1;
 		my @s = split(/ /, $r);
