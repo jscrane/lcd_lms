@@ -141,10 +141,10 @@ my $playing = 0;
 my $t = 0;
 my $start_time;
 
-debug( "lms < listen 1", $deb_lms );
+debug "lms < listen 1", $deb_lms;
 my $ans = send_receive $lms, "listen 1";
 chomp $ans;
-debug( "lms > $ans", $deb_lms );
+debug "lms > $ans", $deb_lms;
 
 lms_send "mixer volume ?";
 lms_send "mode ?";
@@ -198,6 +198,7 @@ sub HELP_MESSAGE {
 		"	-d <server:port>	connect to LCDd ($DEF_LCDD:$DEF_LCDPORT)\n" .
 		"	-l <server:port>	connect to LMS ($DEF_LMS:$DEF_LMSPORT)\n" .
 		"	-v <lcd | lms | all>	debug conversation with lcd, lms or both\n";
+		"	-m			map UTF-8 chars for display on lcd\n";
 	exit(0);
 }
 
@@ -211,22 +212,22 @@ sub send_receive {
 
 sub lcd_send_receive {
 	my $cmd = shift;
-	debug( "lcd < $cmd", $deb_lcd );
+	debug "lcd < $cmd", $deb_lcd;
 	my $res = send_receive $lcd, $cmd;
 	chomp $res;
-	debug( "lcd > $res", $deb_lcd );
+	debug "lcd > $res", $deb_lcd;
 	return $res;
 }
 
 sub lms_send_receive {
 	my $query = shift . " ?";
 	print $lms "$query\n";
-	debug("lms < " . uri_unescape($query), $deb_lms);
+	debug "lms < " . uri_unescape($query), $deb_lms;
 
 	while () {
 		my $ans = <$lms>;
 		chomp $ans;
-		debug("lms > " . uri_unescape($ans), $deb_lms);
+		debug "lms > " . uri_unescape($ans), $deb_lms;
 		if ($ans =~ /^$query (.+)/) {
 			return $1;
 		}
@@ -236,7 +237,7 @@ sub lms_send_receive {
 sub lms_send {
 	my $cmd = "$player_id " . shift;
 	print $lms "$cmd\n";
-	debug("lms < " . uri_unescape($cmd), $deb_lms);
+	debug "lms < " . uri_unescape($cmd), $deb_lms;
 
 	my $ans = <$lms>;
 	lms_response $ans;
@@ -375,6 +376,8 @@ sub set_status {
 }
 
 sub set_progress {
+	$current_track = shift;
+	$total_tracks = shift;
 	my $p = "";
 	if ($total_tracks > 0) {
 		$p = sprintf "%d/%d", $current_track, $total_tracks;
@@ -440,10 +443,8 @@ sub clear_track {
 	set_album "";
 	set_artist "";
 	set_status "stop";
-	$total_tracks = 0;
-	$current_track = 0;
 	set_playing 0;
-	set_progress;
+	set_progress 0, 0;
 }
 
 sub playlist {
@@ -456,7 +457,7 @@ sub playlist {
 	case "album"		{ shift; set_album uri_unescape(shift); }
 	case "artist"		{ shift; set_artist uri_unescape(shift); }
 	case "duration"		{ shift; $current_duration = shift; set_elapsed_time; }
-	case "tracks"		{ $total_tracks = int(shift); set_progress; }
+	case "tracks"		{ set_progress $current_track, int(shift); }
 	case "loadtracks"	{ lms_send "playlist tracks ?"; }
 	case "addtracks"	{ lms_send "playlist tracks ?"; }
 	case "load_done"	{ lms_send "playlist tracks ?"; }
@@ -465,15 +466,13 @@ sub playlist {
 		my $id;
 		if ( $a ne "+1" ) {
 			$id = int($a);
-			$current_track = $id + 1;
 		} elsif ( $current_track < $total_tracks ) {
 			$id = $current_track;
-			$current_track++; 
 		} else {
 			lms_send "stop";
 			return;
 		}
-		set_progress;
+		set_progress $id + 1, $total_tracks;
 		lms_send "playlist title $id ?";
 		lms_send "playlist album $id ?";
 		lms_send "playlist artist $id ?";
@@ -484,7 +483,7 @@ sub playlist {
 		my $t = uri_unescape(shift);
 		my $id = shift;
 		if (defined $id) { 
-			$current_track = $id + 1; 
+			set_progress $id + 1, $total_tracks;
 			lms_send "playlist title $id ?";
 			lms_send "playlist album $id ?";
 			lms_send "playlist artist $id ?";
@@ -495,7 +494,6 @@ sub playlist {
 			lms_send "playlist title $id ?";
 			lms_send "playlist artist $id ?";
 		}
-		set_progress;
 		set_playing 1;
 	}
 	else { msg( "playlist: $cmd", $deb_lms ); }
@@ -536,7 +534,7 @@ sub prefset {
 sub lms_response {
 	my $input = shift;
 	chomp $input;
-	debug("lms > " . uri_unescape($input), $deb_lms);
+	debug "lms > " . uri_unescape($input), $deb_lms;
 	if ( $input =~ /$player_id (.+)/ ) {
 		my $r = $1;
 		my @s = split(/ /, $r);
@@ -548,6 +546,7 @@ sub lms_response {
 		case "time"	{ set_time $s[1]; }
 		case "play"	{ lms_send "mode ?"; }
 		case "pause"	{ lms_send "mode ?"; }
+		case "stop"	{ lms_send "mode ?"; }
 		else		{ msg( "unknown: [$r]", $deb_lms ); }
 		}
 	}
