@@ -40,6 +40,7 @@ sub set_status;
 sub set_playing;
 sub set_volume;
 sub HELP_MESSAGE;
+sub mode;
 
 my %opt = ();
 getopts("d:l:v:m", \%opt);
@@ -197,7 +198,7 @@ sub HELP_MESSAGE {
 	print STDERR "    where <options> are:\n" .
 		"	-d <server:port>	connect to LCDd ($DEF_LCDD:$DEF_LCDPORT)\n" .
 		"	-l <server:port>	connect to LMS ($DEF_LMS:$DEF_LMSPORT)\n" .
-		"	-v <lcd | lms | all>	debug conversation with lcd, lms or both\n";
+		"	-v <lcd | lms | all>	debug conversation with lcd, lms or both\n" .
 		"	-m			map UTF-8 chars for display on lcd\n";
 	exit(0);
 }
@@ -451,8 +452,8 @@ sub playlist {
 	my $cmd = shift;
 	switch ($cmd) {
 	case "clear"		{ clear_track; }
-	case "stop"		{ lms_send "mode ?"; }
-	case "pause"		{ lms_send "mode ?"; }
+	case "stop"		{ mode "stop"; }
+	case "pause"		{ }
 	case "title"		{ shift; set_title uri_unescape(shift); }
 	case "album"		{ shift; set_album uri_unescape(shift); }
 	case "artist"		{ shift; set_artist uri_unescape(shift); }
@@ -544,10 +545,10 @@ sub lms_response {
 		case "mixer" 	{ shift @s; mixer @s; }
 		case "mode" 	{ shift @s; mode @s; }
 		case "time"	{ set_time $s[1]; }
-		case "play"	{ lms_send "mode ?"; }
-		case "pause"	{ lms_send "mode ?"; }
-		case "stop"	{ lms_send "mode ?"; }
-		else		{ msg( "unknown: [$r]", $deb_lms ); }
+		case "play"	{ mode "play"; }
+		case "pause"	{ mode( (defined($s[1]) && $s[1] == 0)? "play": "pause" ); }
+		case "stop"	{ mode "stop"; }
+		else		{ msg "unknown: [$r]", $deb_lms; }
 		}
 	}
 }
