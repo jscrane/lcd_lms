@@ -40,7 +40,6 @@ sub set_status;
 sub set_playing;
 sub set_volume;
 sub HELP_MESSAGE;
-sub mode;
 
 my %opt = ();
 getopts("d:l:v:m", \%opt);
@@ -142,8 +141,9 @@ my $playing = 0;
 my $t = 0;
 my $start_time;
 
-debug "lms < listen 1", $deb_lms;
-my $ans = send_receive $lms, "listen 1";
+my $sub = "subscribe playlist,mixer,time,mode";
+debug "lms < $sub", $deb_lms;
+my $ans = send_receive $lms, $sub;
 chomp $ans;
 debug "lms > $ans", $deb_lms;
 
@@ -342,7 +342,7 @@ sub set_artist {
 			lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 h 3 \"\"";
 			lcd_send_receive "widget_set $PLAYER title 1 1 $width 3 v 8 \"$s\"";
 			return;
-		} 
+		}
 		if (length($title) >= $width && length($artist) == 0) {
 			my $t = multiline($title);
 			lcd_send_receive "widget_set $PLAYER title 1 1 $width 3 v 8 \"$t\"";
@@ -439,21 +439,18 @@ sub set_playing {
 	}
 }
 
-sub clear_track {
-	set_title "";
-	set_album "";
-	set_artist "";
-	set_status "stop";
-	set_playing 0;
-	set_progress 0, 0;
-}
-
 sub playlist {
 	my $cmd = shift;
 	switch ($cmd) {
-	case "clear"		{ clear_track; }
-	case "stop"		{ mode "stop"; }
-	case "pause"		{ }
+	case "clear"		{
+		set_title "";
+		set_album "";
+		set_artist "";
+		set_status "stop";
+		set_playing 0;
+		set_progress 0, 0;
+	}
+	case "pause"		{ set_playing !shift; }
 	case "title"		{ shift; set_title uri_unescape(shift); }
 	case "album"		{ shift; set_album uri_unescape(shift); }
 	case "artist"		{ shift; set_artist uri_unescape(shift); }
@@ -462,7 +459,7 @@ sub playlist {
 	case "loadtracks"	{ lms_send "playlist tracks ?"; }
 	case "addtracks"	{ lms_send "playlist tracks ?"; }
 	case "load_done"	{ lms_send "playlist tracks ?"; }
-	case "index"		{ 
+	case "index"		{
 		my $a = uri_unescape(shift);
 		my $id;
 		if ( $a ne "+1" ) {
@@ -480,10 +477,10 @@ sub playlist {
 		lms_send "playlist duration $id ?";
 		lms_send "time ?";
 	}
-	case "newsong"		{ 
+	case "newsong"		{
 		my $t = uri_unescape(shift);
 		my $id = shift;
-		if (defined $id) { 
+		if (defined $id) {
 			set_progress $id + 1, $total_tracks;
 			lms_send "playlist title $id ?";
 			lms_send "playlist album $id ?";
@@ -514,21 +511,13 @@ sub mode {
 	switch ($cmd) {
 	case "stop"	{ set_playing 0; set_status $cmd; }
 	case "pause"	{ set_playing 0; set_status $cmd; }
-	case "play"	{ 
+	case "play"	{
 		set_playing 1;
-		set_status $cmd; 
-		lms_send "playlist tracks ?"; 
-		lms_send "playlist index ?"; 
+		set_status $cmd;
+		lms_send "playlist tracks ?";
+		lms_send "playlist index ?";
 	}
 	else		{ msg( "mode: $cmd", $deb_lms ); }
-	}
-}
-
-sub prefset {
-	my $cmd = shift;
-	switch ($cmd) {
-	case "server"	{ if (shift eq "volume") { set_volume shift; } }
-	else		{ msg( "prefset: $cmd", $deb_lms ); }
 	}
 }
 
@@ -541,13 +530,9 @@ sub lms_response {
 		my @s = split(/ /, $r);
 		switch ($s[0]) {
 		case "playlist" { shift @s; playlist @s; }
-		case "prefset" 	{ shift @s; prefset @s; }
 		case "mixer" 	{ shift @s; mixer @s; }
 		case "mode" 	{ shift @s; mode @s; }
 		case "time"	{ set_time $s[1]; }
-		case "play"	{ mode "play"; }
-		case "pause"	{ mode( (defined($s[1]) && $s[1] == 0)? "play": "pause" ); }
-		case "stop"	{ mode "stop"; }
 		else		{ msg "unknown: [$r]", $deb_lms; }
 		}
 	}
@@ -607,7 +592,7 @@ The LMS player name.
 =item Cannot connect to LMS server at localhost:9090
 
 By default lcd_lms tries to connect to LMS running on host I<localhost> and
-port 9090.  Change the host and port where LMS is running using the 
+port 9090.  Change the host and port where LMS is running using the
 B<-l> option above.
 
 =item Cannot connect to LCDd daemon at localhost:13066
