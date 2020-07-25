@@ -501,7 +501,15 @@ sub playlist {
 sub mixer {
 	my $cmd = shift;
 	switch ($cmd) {
-	case "volume"	{ set_volume uri_unescape(shift); }
+	case "volume"	{
+		my $vol = uri_unescape(shift);
+		my $c = substr($vol, 0, 1);
+		if ($c eq '-' || $c eq '+') {
+			lms_send "mixer volume ?";
+		} else {
+			set_volume $vol;
+		}
+	}
 	else		{ msg( "mixer: $cmd", $deb_lms ); }
 	}
 }
