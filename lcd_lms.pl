@@ -450,6 +450,7 @@ sub playlist {
 		set_playing 0;
 		set_progress 0, 0;
 	}
+	case "stop"		{ set_playing 0; }
 	case "pause"		{ set_playing !shift; }
 	case "title"		{ shift; set_title uri_unescape(shift); }
 	case "album"		{ shift; set_album uri_unescape(shift); }
