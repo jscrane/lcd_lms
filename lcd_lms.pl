@@ -450,7 +450,7 @@ sub playlist {
 		set_playing 0;
 		set_progress 0, 0;
 	}
-	case "stop"		{ set_playing 0; }
+	case "stop"		{ set_playing 0; set_progress 0, 0; }
 	case "pause"		{ set_playing !shift; }
 	case "title"		{ shift; set_title uri_unescape(shift); }
 	case "album"		{ shift; set_album uri_unescape(shift); }
@@ -482,7 +482,11 @@ sub playlist {
 		my $t = uri_unescape(shift);
 		my $id = shift;
 		if (defined $id) {
-			set_progress $id + 1, $total_tracks;
+			my $next_id = $id + 1;
+			if ($next_id == $current_track) {
+				return;
+			}
+			set_progress $next_id, $total_tracks;
 			lms_send "playlist title $id ?";
 			lms_send "playlist album $id ?";
 			lms_send "playlist artist $id ?";
