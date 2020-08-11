@@ -151,7 +151,7 @@ lms_send "mixer volume ?";
 lms_send "mode ?";
 
 while () {
-	while (my @ready = $sel->can_read(1)) {
+	while (my @ready = $sel->can_read(0.9)) {
 		my $fh;
 		foreach $fh (@ready) {
 			my $input = <$fh>;
@@ -450,7 +450,7 @@ sub playlist {
 		set_playing 0;
 		set_progress 0, 0;
 	}
-	case "stop"		{ set_playing 0; set_progress 0, 0; }
+	case "stop"		{ set_playing 0; }
 	case "pause"		{ set_playing !shift; }
 	case "title"		{ shift; set_title uri_unescape(shift); }
 	case "album"		{ shift; set_album uri_unescape(shift); }
@@ -460,44 +460,24 @@ sub playlist {
 	case "loadtracks"	{ lms_send "playlist tracks ?"; }
 	case "addtracks"	{ lms_send "playlist tracks ?"; }
 	case "load_done"	{ lms_send "playlist tracks ?"; }
-	case "index"		{
-		my $a = uri_unescape(shift);
-		my $id;
-		if ( $a ne "+1" ) {
-			$id = int($a);
-		} elsif ( $current_track < $total_tracks ) {
-			$id = $current_track;
-		} else {
-			lms_send "stop";
-			return;
-		}
-		set_progress $id + 1, $total_tracks;
-		lms_send "playlist title $id ?";
-		lms_send "playlist album $id ?";
-		lms_send "playlist artist $id ?";
-		lms_send "playlist duration $id ?";
-		lms_send "time ?";
-	}
 	case "newsong"		{
 		my $t = uri_unescape(shift);
+		set_title $t;
 		my $id = shift;
 		if (defined $id) {
 			my $next_id = $id + 1;
 			if ($next_id == $current_track) {
 				return;
 			}
-			set_progress $next_id, $total_tracks;
-			lms_send "playlist title $id ?";
-			lms_send "playlist album $id ?";
-			lms_send "playlist artist $id ?";
 			lms_send "playlist duration $id ?";
+			lms_send "playlist album $id ?";
+			set_progress $id + 1, $total_tracks;
 		} else {
 			set_album "";
 			$id = $current_track - 1;
-			lms_send "playlist title $id ?";
-			lms_send "playlist artist $id ?";
 		}
 		set_playing 1;
+		lms_send "playlist artist $id ?";
 	}
 	else { msg( "playlist: $cmd", $deb_lms ); }
 	}
@@ -528,7 +508,6 @@ sub mode {
 		set_playing 1;
 		set_status $cmd;
 		lms_send "playlist tracks ?";
-		lms_send "playlist index ?";
 	}
 	else		{ msg( "mode: $cmd", $deb_lms ); }
 	}
