@@ -141,7 +141,8 @@ my $playing = 0;
 my $t = 0;
 my $start_time;
 
-my $sub = "subscribe playlist,mixer,time,mode";
+#my $sub = "listen 1";
+my $sub = "subscribe playlist,mixer,time,mode,play";
 debug "lms < $sub", $deb_lms;
 my $ans = send_receive $lms, $sub;
 chomp $ans;
