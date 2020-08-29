@@ -2,6 +2,8 @@
 Script to glue the Logitech Media Server 
 [command-line](http://wiki.slimdevices.com/index.php/Logitech_Media_Server_CLI) to LCDd.
 
+It tracks the latest version of LMS installed, currently version [8.0.0~1594451286](http://downloads.slimdevices.com/nightly/index.php?ver=8.0).
+
 See it in [action](https://programmablehardware.blogspot.ie/2013/06/squeezeplug-lcd.html).
 
 ## Requirements
