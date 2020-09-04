@@ -142,7 +142,7 @@ my $t = 0;
 my $start_time;
 
 #my $sub = "listen 1";
-my $sub = "subscribe playlist,mixer,time,mode,play";
+my $sub = "subscribe playlist,mixer,time,mode,play,pause";
 debug "lms < $sub", $deb_lms;
 my $ans = send_receive $lms, $sub;
 chomp $ans;
