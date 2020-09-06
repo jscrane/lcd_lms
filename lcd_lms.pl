@@ -171,7 +171,8 @@ while () {
 						lms_send "playlist clear";
 					}
 				} elsif ( $input eq "key $pause_key\n" ) {
-					lms_send "pause";
+					my $p = $playing == 1? 1: 0;
+					lms_send "pause $p";
 				}
 			}
 		}
@@ -530,6 +531,7 @@ sub lms_response {
 		case "mixer" 	{ shift @s; mixer @s; }
 		case "mode" 	{ shift @s; mode @s; }
 		case "time"	{ set_time $s[1]; }
+		case "pause"	{ set_playing !$s[1]; }
 		else		{ msg "unknown: [$r]", $deb_lms; }
 		}
 	}
