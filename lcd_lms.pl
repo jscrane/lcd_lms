@@ -472,7 +472,7 @@ sub playlist {
 		my $id = shift;
 		if (defined $id) {
 			my $next_id = $id + 1;
-			if ($next_id == $current_track) {
+			if ($playing && $next_id == $current_track) {
 				return;
 			}
 			lms_send "playlist duration $id ?";
