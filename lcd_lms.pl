@@ -131,7 +131,7 @@ lcd_send_receive "widget_add CLOCK date string";
 my $sel = IO::Select->new( $lcd, $lms );
 
 my $total_tracks = 0;
-my $current_track = 0;
+my $current_track_id = -1;
 my $elapsed_time = 0;
 my $current_duration = 0;
 my $title = "";
@@ -281,6 +281,7 @@ sub trim {
 				if ($o == 0x80) {
 					$o = ord( substr( $s, $i, 1 ) );
 					switch($o) {
+					case 0x99 { $t .= "\'" }
 					case 0x93 { $t .= "-" }
 					case 0x98 { $t .= "`" }
 					case 0x99 { $t .= "'" }
@@ -383,11 +384,11 @@ sub set_status {
 }
 
 sub set_progress {
-	$current_track = shift;
+	$current_track_id = shift;
 	$total_tracks = shift;
 	my $p = "";
 	if ($total_tracks > 0) {
-		$p = sprintf "%d/%d", $current_track, $total_tracks;
+		$p = sprintf "%d/%d", $current_track_id + 1, $total_tracks;
 		$p = sprintf "% 6s", $p;
 	}
 	lcd_send_receive "widget_set $PLAYER progress 15 4 \"$p\"";
@@ -445,24 +446,25 @@ sub set_playing {
 	}
 }
 
+sub set_stopped {
+	set_title "";
+	set_album "";
+	set_artist "";
+	set_status "stop";
+	set_playing 0;
+}
+
 sub playlist {
 	my $cmd = shift;
 	switch ($cmd) {
-	case "clear"		{
-		set_title "";
-		set_album "";
-		set_artist "";
-		set_status "stop";
-		set_playing 0;
-		set_progress 0, 0;
-	}
-	case "stop"		{ set_playing 0; }
+	case "clear"		{ set_stopped; set_progress -1, 0; }
+	case "stop"		{ set_stopped; }
 	case "pause"		{ set_playing !shift; }
 	case "title"		{ shift; set_title uri_unescape(shift); }
 	case "album"		{ shift; set_album uri_unescape(shift); }
 	case "artist"		{ shift; set_artist uri_unescape(shift); }
 	case "duration"		{ shift; $current_duration = shift; set_elapsed_time; }
-	case "tracks"		{ set_progress $current_track, int(shift); }
+	case "tracks"		{ set_progress $current_track_id, int(shift); }
 	case "loadtracks"	{ lms_send "playlist tracks ?"; }
 	case "addtracks"	{ lms_send "playlist tracks ?"; }
 	case "load_done"	{ lms_send "playlist tracks ?"; }
@@ -471,16 +473,15 @@ sub playlist {
 		set_title $t;
 		my $id = shift;
 		if (defined $id) {
-			my $next_id = $id + 1;
-			if ($playing && $next_id == $current_track) {
+			if ($playing && $id == $current_track_id) {
 				return;
 			}
 			lms_send "playlist duration $id ?";
 			lms_send "playlist album $id ?";
-			set_progress $id + 1, $total_tracks;
+			set_progress $id, $total_tracks;
 		} else {
 			set_album "";
-			$id = $current_track - 1;
+			$id = $current_track_id;
 		}
 		set_playing 1;
 		lms_send "playlist artist $id ?";
