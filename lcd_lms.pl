@@ -2,6 +2,7 @@
 
 use 5.005;
 use strict;
+use warnings;
 use Getopt::Std;
 use IO::Socket;
 use IO::Select;
@@ -209,7 +210,7 @@ sub send_receive {
 	my $fd = shift;
 	my $cmd = shift;
 
-	print $fd "$cmd\n";
+	print $fd qq($cmd\n);
 	return <$fd>;
 }
 
@@ -285,8 +286,8 @@ sub trim {
 					case 0x93 { $t .= "-" }
 					case 0x98 { $t .= "`" }
 					case 0x99 { $t .= "'" }
-					case 0x9c { $t .= "\"" }
-					case 0x9d { $t .= "\"" }
+					case 0x9c { $t .= "\\\"" }
+					case 0x9d { $t .= "\\\"" }
 					case 0xb9 { $t .= "<" }
 					case 0xba { $t .= ">" }
 					else { msg( "unknown 0xe2 0x80 char-2 $o", $deb_lms ); }
