@@ -282,10 +282,12 @@ sub trim {
 				if ($o == 0x80) {
 					$o = ord( substr( $s, $i, 1 ) );
 					switch($o) {
-					case 0x99 { $t .= "\'" }
+					case 0x90 { $t .= "-" }
+					case 0x91 { $t .= "-" }
+					case 0x92 { $t .= "-" }
 					case 0x93 { $t .= "-" }
 					case 0x98 { $t .= "`" }
-					case 0x99 { $t .= "'" }
+					case 0x99 { $t .= "\'" }
 					case 0x9c { $t .= "\\\"" }
 					case 0x9d { $t .= "\\\"" }
 					case 0xb9 { $t .= "<" }
