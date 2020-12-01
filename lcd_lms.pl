@@ -43,7 +43,7 @@ sub set_volume;
 sub HELP_MESSAGE;
 
 my %opt = ();
-getopts("d:l:v:m", \%opt);
+getopts("d:l:v:mL", \%opt);
 
 my ($dh, $dp) = split(/:/, $opt{d}) if (defined($opt{d}));
 my $LCDD = (defined($dh) && $dh ne '')? $dh: $DEF_LCDD;
@@ -57,6 +57,7 @@ my $deb_all = defined($opt{v}) ? $opt{v} eq 'all': 0;
 my $deb_lcd = $deb_all || (defined($opt{v}) ? $opt{v} eq 'lcd': 0);
 my $deb_lms = $deb_all || (defined($opt{v}) ? $opt{v} eq 'lms': 0);
 my $charmap = defined($opt{m});
+my $listen = defined($opt{L});
 
 if ( $#ARGV != 0 ) {
 	HELP_MESSAGE;
@@ -142,8 +143,10 @@ my $playing = 0;
 my $t = 0;
 my $start_time;
 
-#my $sub = "listen 1";
 my $sub = "subscribe playlist,mixer,time,mode,play,pause";
+if ( $listen ) {
+	$sub = "listen 1";
+}
 debug "lms < $sub", $deb_lms;
 my $ans = send_receive $lms, $sub;
 chomp $ans;
@@ -202,6 +205,7 @@ sub HELP_MESSAGE {
 		"	-d <server:port>	connect to LCDd ($DEF_LCDD:$DEF_LCDPORT)\n" .
 		"	-l <server:port>	connect to LMS ($DEF_LMS:$DEF_LMSPORT)\n" .
 		"	-v <lcd | lms | all>	debug conversation with lcd, lms or both\n" .
+		"	-L			listen to all messages from lms\n" .
 		"	-m			map UTF-8 chars for display on lcd\n";
 	exit(0);
 }
