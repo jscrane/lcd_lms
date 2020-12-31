@@ -154,6 +154,11 @@ debug "lms > $ans", $deb_lms;
 
 lms_send "mixer volume ?";
 lms_send "mode ?";
+lms_send "time ?";
+lms_send "playlist index ?";
+lms_send "playlist title ?";
+lms_send "playlist album ?";
+lms_send "playlist artist ?";
 
 while () {
 	while (my @ready = $sel->can_read(0.9)) {
@@ -472,6 +477,7 @@ sub playlist {
 	case "artist"		{ shift; set_artist uri_unescape(shift); }
 	case "duration"		{ shift; $current_duration = shift; set_elapsed_time; }
 	case "tracks"		{ set_progress $current_track_id, int(shift); }
+	case "index"		{ set_progress int(shift), $total_tracks; }
 	case "loadtracks"	{ lms_send "playlist tracks ?"; }
 	case "addtracks"	{ lms_send "playlist tracks ?"; }
 	case "load_done"	{ lms_send "playlist tracks ?"; }
@@ -491,6 +497,7 @@ sub playlist {
 			$id = $current_track_id;
 		}
 		set_playing 1;
+		lms_send "playlist title $id ?";
 		lms_send "playlist artist $id ?";
 	}
 	else { msg( "playlist: $cmd", $deb_lms ); }
