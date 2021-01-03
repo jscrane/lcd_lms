@@ -143,7 +143,7 @@ my $playing = 0;
 my $t = 0;
 my $start_time;
 
-my $sub = "subscribe playlist,mixer,time,mode,play,pause";
+my $sub = "subscribe playlist,mixer,time,mode,play,pause,title,album,artist";
 if ( $listen ) {
 	$sub = "listen 1";
 }
@@ -155,10 +155,11 @@ debug "lms > $ans", $deb_lms;
 lms_send "mixer volume ?";
 lms_send "mode ?";
 lms_send "time ?";
+lms_send "duration ?";
 lms_send "playlist index ?";
-lms_send "playlist title ?";
-lms_send "playlist album ?";
-lms_send "playlist artist ?";
+lms_send "title ?";
+lms_send "album ?";
+lms_send "artist ?";
 
 while () {
 	while (my @ready = $sel->can_read(0.9)) {
@@ -472,33 +473,28 @@ sub playlist {
 	case "clear"		{ set_stopped; set_progress -1, 0; }
 	case "stop"		{ set_stopped; }
 	case "pause"		{ set_playing !shift; }
-	case "title"		{ shift; set_title uri_unescape(shift); }
-	case "album"		{ shift; set_album uri_unescape(shift); }
-	case "artist"		{ shift; set_artist uri_unescape(shift); }
-	case "duration"		{ shift; $current_duration = shift; set_elapsed_time; }
 	case "tracks"		{ set_progress $current_track_id, int(shift); }
 	case "index"		{ set_progress int(shift), $total_tracks; }
 	case "loadtracks"	{ lms_send "playlist tracks ?"; }
 	case "addtracks"	{ lms_send "playlist tracks ?"; }
 	case "load_done"	{ lms_send "playlist tracks ?"; }
+	case "delete"		{ lms_send "playlist tracks ?"; lms_send "playlist index ?"; }
 	case "newsong"		{
-		my $t = uri_unescape(shift);
-		set_title $t;
+		shift;
 		my $id = shift;
 		if (defined $id) {
 			if ($playing && $id == $current_track_id) {
 				return;
 			}
-			lms_send "playlist duration $id ?";
-			lms_send "playlist album $id ?";
+			lms_send "duration ?";
+			lms_send "album ?";
 			set_progress $id, $total_tracks;
 		} else {
 			set_album "";
-			$id = $current_track_id;
 		}
 		set_playing 1;
-		lms_send "playlist title $id ?";
-		lms_send "playlist artist $id ?";
+		lms_send "title ?";
+		lms_send "artist ?";
 	}
 	else { msg( "playlist: $cmd", $deb_lms ); }
 	}
@@ -547,6 +543,10 @@ sub lms_response {
 		case "mode" 	{ shift @s; mode @s; }
 		case "time"	{ set_time $s[1]; }
 		case "pause"	{ set_playing !$s[1]; }
+		case "artist"	{ shift @s; set_artist uri_unescape shift @s; }
+		case "album"	{ shift @s; set_album uri_unescape shift @s; }
+		case "title"	{ shift @s; set_title uri_unescape shift @s; }
+		case "duration"	{ shift @s; $current_duration = shift @s; set_elapsed_time; }
 		else		{ msg "unknown: [$r]", $deb_lms; }
 		}
 	}
