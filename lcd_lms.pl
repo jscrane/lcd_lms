@@ -13,6 +13,7 @@ use URI::Escape;
 use POSIX qw(strftime);
 use Time::HiRes;
 use Log::Message::Simple qw(debug msg);
+use Sys::Hostname;
 
 my $DEF_LCDD = "localhost";
 my $DEF_LCDPORT = "13666";
@@ -43,7 +44,11 @@ sub set_volume;
 sub HELP_MESSAGE;
 
 my %opt = ();
-getopts("d:l:v:mL", \%opt);
+getopts("d:l:v:mLh", \%opt);
+
+if ( defined($opt{h}) ) {
+	HELP_MESSAGE;
+}
 
 my ($dh, $dp) = split(/:/, $opt{d}) if (defined($opt{d}));
 my $LCDD = (defined($dh) && $dh ne '')? $dh: $DEF_LCDD;
@@ -59,11 +64,11 @@ my $deb_lms = $deb_all || (defined($opt{v}) ? $opt{v} eq 'lms': 0);
 my $charmap = defined($opt{m});
 my $listen = defined($opt{L});
 
-if ( $#ARGV != 0 ) {
-	HELP_MESSAGE;
-}
+my $PLAYER = hostname;
 
-my $PLAYER = $ARGV[0];
+if ( $#ARGV == 0 ) {
+	$PLAYER = $ARGV[0];
+}
 
 # Connect to the servers...
 my $lms = IO::Socket::INET->new(
@@ -206,13 +211,15 @@ sub error($@) {
 }
 
 sub HELP_MESSAGE {
-	print STDERR "Usage: $progname [<options>] <player>\n";
+	print STDERR "Usage: $progname [<options>] [player]\n";
 	print STDERR "    where <options> are:\n" .
 		"	-d <server:port>	connect to LCDd ($DEF_LCDD:$DEF_LCDPORT)\n" .
 		"	-l <server:port>	connect to LMS ($DEF_LMS:$DEF_LMSPORT)\n" .
 		"	-v <lcd | lms | all>	debug conversation with lcd, lms or both\n" .
 		"	-L			listen to all messages from lms\n" .
-		"	-m			map UTF-8 chars for display on lcd\n";
+		"	-m			map UTF-8 chars for display on lcd\n".
+		"	-h			this help message\n".
+		"    if player is omitted it defaults to the local host name\n";
 	exit(0);
 }
 
