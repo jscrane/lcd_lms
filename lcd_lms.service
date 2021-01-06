@@ -7,7 +7,7 @@ User=nobody
 Type=simple
 Restart=always
 RestartSec=30
-ExecStart=/usr/local/bin/lcd_lms.pl -m SqueezeLite
+ExecStart=/usr/local/bin/lcd_lms.pl -m
 
 [Install]
 WantedBy=multi-user.target
