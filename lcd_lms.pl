@@ -287,11 +287,18 @@ sub trim {
 			my $c = substr( $s, $i, 1 );
 			my $o = ord( $c );
 			if ($o == 0xc2) {
-				$i++;
+				# pass
 			} elsif ($o == 0xc3) {
 				$i++;
 				$o = ord( substr( $s, $i, 1 ) );
 				$t .= chr( ($o % 0x100) + 0x40 );
+			} elsif ($o == 0xc5) {
+				$i++;
+				$o = ord( substr( $s, $i, 1 ) );
+				switch ($o) {
+				case 0x8d { $t .= "o" }
+				else { msg( "unknown 0xc5 char $o", $deb_lms ); }
+				}
 			} elsif ($o == 0xe2) {
 				$i++;
 				$o = ord( substr( $s, $i, 1 ) );
