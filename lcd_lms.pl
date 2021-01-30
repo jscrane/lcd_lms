@@ -468,8 +468,10 @@ sub set_playing {
 			$elapsed_time = 0;
 		}
 	} else {
-		lcd_send_receive "screen_set $PLAYER priority foreground backlight on";
 		$start_time = time();
+		lcd_send_receive "screen_set $PLAYER priority foreground backlight on";
+		lms_send "playlist tracks ?";
+		lms_send "playlist index ?";
 	}
 }
 
