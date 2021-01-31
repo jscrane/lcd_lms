@@ -300,27 +300,22 @@ sub trim {
 				else { msg( "unknown 0xc5 char $o", $deb_lms ); }
 				}
 			} elsif ($o == 0xe2) {
-				$i++;
-				$o = ord( substr( $s, $i, 1 ) );
-				$i++;
-				if ($o == 0x80) {
-					$o = ord( substr( $s, $i, 1 ) );
-					switch($o) {
-					case 0x90 { $t .= "-" }
-					case 0x91 { $t .= "-" }
-					case 0x92 { $t .= "-" }
-					case 0x93 { $t .= "-" }
-					case 0x98 { $t .= "`" }
-					case 0x99 { $t .= "\'" }
-					case 0x9c { $t .= "\\\"" }
-					case 0x9d { $t .= "\\\"" }
-					case 0xb9 { $t .= "<" }
-					case 0xba { $t .= ">" }
-					else { msg( "unknown 0xe2 0x80 char-2 $o", $deb_lms ); }
-					}
-				} else {
-					msg( "unknown 0xe2 char-1 $o", $deb_lms );
+				$o = ord(substr($s, $i+1, 1))*256 + ord(substr($s, $i+2, 1));
+				switch($o) {
+				case 0x8090 { $t .= "-" }
+				case 0x8091 { $t .= "-" }
+				case 0x8092 { $t .= "-" }
+				case 0x8093 { $t .= "-" }
+				case 0x8098 { $t .= "`" }
+				case 0x8099 { $t .= "\'" }
+				case 0x809c { $t .= "\\\"" }
+				case 0x809d { $t .= "\\\"" }
+				case 0x80b9 { $t .= "<" }
+				case 0x80ba { $t .= ">" }
+				case 0x99af { $t .= "#" }
+				else { msg( "unknown 0xe2 $o", $deb_lms ); }
 				}
+				$i += 2;
 			} else {
 				$t .= $c;
 			}
