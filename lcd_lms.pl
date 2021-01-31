@@ -360,37 +360,51 @@ sub multiline {
 	return $t . centre($width, $l);
 }
 
+sub two_lines {
+	my $l1 = shift;
+	my $l2 = shift;
+
+	lcd_send_receive "widget_set $PLAYER album 1 2 $width 2 h 3 \"\"";
+	if (length($l1) >= $width && length($l2) >= $width) {
+		my $s = multiline("$l1 $l2");
+		lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 h 3 \"\"";
+		lcd_send_receive "widget_set $PLAYER title 1 1 $width 3 v 8 \"$s\"";
+		return 1;
+	}
+	if (length($l1) >= $width && length($l2) == 0) {
+		my $t = multiline($l1);
+		lcd_send_receive "widget_set $PLAYER title 1 1 $width 3 v 8 \"$t\"";
+		return 1;
+	}
+	if (length($l1) >= $width) {
+		my $t = multiline($l1);
+		lcd_send_receive "widget_set $PLAYER title 1 1 $width 2 v 8 \"$t\"";
+		my $a = centre($width, $l2);
+		lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 h 3 \"$a\"";
+		return 1;
+	}
+	if (length($l2) >= $width) {
+		my $t = centre($width, $l1);
+		lcd_send_receive "widget_set $PLAYER title 1 1 $width 1 h 3 \"$t\"";
+		my $a = multiline($l2);
+		lcd_send_receive "widget_set $PLAYER artist 1 2 $width 3 v 8 \"$a\"";
+		return 1;
+	}
+	return 0;
+}
+
 sub set_artist {
 	$artist = shift;
 	$artist = (!defined $artist)? "": trim($artist);
 
-	if (length($album) == 0) {
-		lcd_send_receive "widget_set $PLAYER album 1 2 $width 2 h 3 \"\"";
-		if (length($title) >= $width && length($artist) >= $width) {
-			my $s = multiline("$title $artist");
-			lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 h 3 \"\"";
-			lcd_send_receive "widget_set $PLAYER title 1 1 $width 3 v 8 \"$s\"";
-			return;
-		}
-		if (length($title) >= $width && length($artist) == 0) {
-			my $t = multiline($title);
-			lcd_send_receive "widget_set $PLAYER title 1 1 $width 3 v 8 \"$t\"";
-			return;
-		}
-		if (length($title) >= $width) {
-			my $t = multiline($title);
-			lcd_send_receive "widget_set $PLAYER title 1 1 $width 2 v 8 \"$t\"";
-			my $a = centre($width, $artist);
-			lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 h 3 \"$a\"";
-			return;
-		}
-		if (length($artist) >= $width) {
-			my $t = centre($width, $title);
-			lcd_send_receive "widget_set $PLAYER title 1 1 $width 1 h 3 \"$t\"";
-			my $a = multiline($artist);
-			lcd_send_receive "widget_set $PLAYER artist 1 2 $width 3 v 8 \"$a\"";
-			return;
-		}
+	if (length($title) == 0 && two_lines($album, $artist)) {
+		return;
+	}
+	if (length($album) == 0 && two_lines($title, $artist)) {
+		return;
+	}
+	if (length($artist) == 0 && two_lines($title, $album)) {
+		return;
 	}
 	my $t = centre($width, $title);
 	my $a = centre($width, $artist);
