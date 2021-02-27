@@ -299,6 +299,13 @@ sub trim {
 				case 0x8d { $t .= "o" }
 				else { msg( "unknown 0xc5 char $o", $deb_lms ); }
 				}
+			} elsif ($o == 0xce) {
+				$i++;
+				$o = ord( substr( $s, $i, 1 ) );
+				switch ($o) {
+				case 0xbc { $t .= chr(0xb5); }
+				else { msg( "unknown 0xce char $o", $deb_lms ); }
+				}
 			} elsif ($o == 0xe2) {
 				$o = ord(substr($s, $i+1, 1))*256 + ord(substr($s, $i+2, 1));
 				switch($o) {
