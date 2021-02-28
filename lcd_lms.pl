@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use 5.005;
+use 5.024;
 use strict;
 use warnings;
 use Getopt::Std;
@@ -14,6 +14,7 @@ use POSIX qw(strftime);
 use Time::HiRes;
 use Log::Message::Simple qw(debug msg);
 use Sys::Hostname;
+use Encode;
 
 my $DEF_LCDD = "localhost";
 my $DEF_LCDPORT = "13666";
@@ -282,49 +283,29 @@ sub trim {
 	# see https://www.i18nqa.com/debug/utf8-debug.html and
 	# table 4: http://fab.cba.mit.edu/classes/863.06/11.13/44780.pdf
 	if ($charmap) {
+		$s = decode( "utf8", $s );
 		my $t = '';
 		for ( my $i = 0; $i < length($s); $i++ ) {
 			my $c = substr( $s, $i, 1 );
 			my $o = ord( $c );
-			if ($o == 0xc2) {
-				# pass
-			} elsif ($o == 0xc3) {
-				$i++;
-				$o = ord( substr( $s, $i, 1 ) );
-				$t .= chr( ($o % 0x100) + 0x40 );
-			} elsif ($o == 0xc5) {
-				$i++;
-				$o = ord( substr( $s, $i, 1 ) );
-				switch ($o) {
-				case 0x8d { $t .= "o" }
-				else { msg( "unknown 0xc5 char $o", $deb_lms ); }
+			switch ($o) {
+				case 0x03bc { $t .= chr(0xb5) }
+				case 0x014d { $t .= 'o' }
+				case 0x2010 { $t .= '-' }
+				case 0x2011 { $t .= '-' }
+				case 0x2012 { $t .= '-' }
+				case 0x2013 { $t .= '-' }
+				case 0x2018 { $t .= "`" }
+				case 0x2019 { $t .= "\'" }
+				case 0x201c { $t .= "\\\"" }
+				case 0x201d { $t .= "\\\"" }
+				case 0x2039 { $t .= "<" }
+				case 0x203a { $t .= ">" }
+				elsif ($o <= 0xff) {
+					$t .= $c
+				} else {
+					msg("unknown unicode $o", $deb_lms);
 				}
-			} elsif ($o == 0xce) {
-				$i++;
-				$o = ord( substr( $s, $i, 1 ) );
-				switch ($o) {
-				case 0xbc { $t .= chr(0xb5); }
-				else { msg( "unknown 0xce char $o", $deb_lms ); }
-				}
-			} elsif ($o == 0xe2) {
-				$o = ord(substr($s, $i+1, 1))*256 + ord(substr($s, $i+2, 1));
-				switch($o) {
-				case 0x8090 { $t .= "-" }
-				case 0x8091 { $t .= "-" }
-				case 0x8092 { $t .= "-" }
-				case 0x8093 { $t .= "-" }
-				case 0x8098 { $t .= "`" }
-				case 0x8099 { $t .= "\'" }
-				case 0x809c { $t .= "\\\"" }
-				case 0x809d { $t .= "\\\"" }
-				case 0x80b9 { $t .= "<" }
-				case 0x80ba { $t .= ">" }
-				case 0x99af { $t .= "#" }
-				else { msg( "unknown 0xe2 $o", $deb_lms ); }
-				}
-				$i += 2;
-			} else {
-				$t .= $c;
 			}
 		}
 		$s = $t;
