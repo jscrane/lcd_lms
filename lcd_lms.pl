@@ -285,8 +285,7 @@ sub trim {
 	if ($charmap) {
 		$s = decode( "utf8", $s );
 		my $t = '';
-		for ( my $i = 0; $i < length($s); $i++ ) {
-			my $c = substr( $s, $i, 1 );
+		foreach my $c (split //, $s) {
 			my $o = ord( $c );
 			switch ($o) {
 				case 0x03bc { $c = chr(0xb5) }
