@@ -289,24 +289,24 @@ sub trim {
 			my $c = substr( $s, $i, 1 );
 			my $o = ord( $c );
 			switch ($o) {
-				case 0x03bc { $t .= chr(0xb5) }
-				case 0x014d { $t .= 'o' }
-				case 0x2010 { $t .= '-' }
-				case 0x2011 { $t .= '-' }
-				case 0x2012 { $t .= '-' }
-				case 0x2013 { $t .= '-' }
-				case 0x2018 { $t .= "`" }
-				case 0x2019 { $t .= "\'" }
-				case 0x201c { $t .= "\\\"" }
-				case 0x201d { $t .= "\\\"" }
-				case 0x2039 { $t .= "<" }
-				case 0x203a { $t .= ">" }
-				elsif ($o <= 0xff) {
-					$t .= $c
-				} else {
+				case 0x03bc { $c = chr(0xb5) }
+				case 0x014d { $c = 'o' }
+				case 0x2010 { $c = '-' }
+				case 0x2011 { $c = '-' }
+				case 0x2012 { $c = '-' }
+				case 0x2013 { $c = '-' }
+				case 0x2018 { $c = "`" }
+				case 0x2019 { $c = "\'" }
+				case 0x201c { $c = "\\\"" }
+				case 0x201d { $c = "\\\"" }
+				case 0x2039 { $c = "<" }
+				case 0x203a { $c = ">" }
+				elsif ($o > 0xff) {
 					msg("unknown unicode $o", $deb_lms);
+					$c = chr(0x71);
 				}
 			}
+			$t .= $c;
 		}
 		$s = $t;
 	}
