@@ -283,9 +283,8 @@ sub trim {
 	# see https://www.i18nqa.com/debug/utf8-debug.html and
 	# table 4: http://fab.cba.mit.edu/classes/863.06/11.13/44780.pdf
 	if ($charmap) {
-		$s = decode( "utf8", $s );
 		my $t = '';
-		foreach my $c (split //, $s) {
+		foreach my $c (split //, decode( "utf8", $s )) {
 			my $o = ord( $c );
 			switch ($o) {
 				case 0x03bc { $c = chr(0xb5) }
@@ -300,9 +299,10 @@ sub trim {
 				case 0x201d { $c = "\\\"" }
 				case 0x2039 { $c = "<" }
 				case 0x203a { $c = ">" }
+				case 0x266f { $c = '#' }
 				elsif ($o > 0xff) {
 					msg("unknown unicode $o", $deb_lms);
-					$c = chr(0x71);
+					$c = chr(0xff);
 				}
 			}
 			$t .= $c;
