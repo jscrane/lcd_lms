@@ -297,6 +297,7 @@ sub trim {
 				case 0x2019 { $c = "\'" }
 				case 0x201c { $c = "\\\"" }
 				case 0x201d { $c = "\\\"" }
+				case 0x2026 { $c = "..." }
 				case 0x2039 { $c = "<" }
 				case 0x203a { $c = ">" }
 				case 0x266f { $c = '#' }
