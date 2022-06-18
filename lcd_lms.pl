@@ -288,6 +288,7 @@ sub trim {
 			my $o = ord( $c );
 			switch ($o) {
 				case 0x03bc { $c = chr(0xb5) }
+				case 0x0131 { $c = 'i' }
 				case 0x014d { $c = 'o' }
 				case 0x2010 { $c = '-' }
 				case 0x2011 { $c = '-' }
@@ -297,6 +298,7 @@ sub trim {
 				case 0x2019 { $c = "\'" }
 				case 0x201c { $c = "\\\"" }
 				case 0x201d { $c = "\\\"" }
+				case 0x2033 { $c = "\\\"" }
 				case 0x2026 { $c = "..." }
 				case 0x2039 { $c = "<" }
 				case 0x203a { $c = ">" }
