@@ -3,7 +3,7 @@ Description=LCD-LMS
 After=LCDd.service squeezelite.service
 
 [Service]
-User=nobody
+DynamicUser=yes
 Type=simple
 Restart=always
 RestartSec=30
