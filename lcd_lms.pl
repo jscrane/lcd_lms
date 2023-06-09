@@ -495,6 +495,9 @@ sub playlist {
 	case "addtracks"	{ lms_send "playlist tracks ?"; }
 	case "load_done"	{ lms_send "playlist tracks ?"; }
 	case "delete"		{ lms_send "playlist tracks ?"; lms_send "playlist index ?"; }
+	case "open"		{
+		lms_send "duration ?";
+	}
 	case "newsong"		{
 		shift;
 		my $id = shift;
