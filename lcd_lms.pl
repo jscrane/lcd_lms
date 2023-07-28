@@ -287,10 +287,12 @@ sub trim {
 		foreach my $c (split //, decode( "utf8", $s )) {
 			my $o = ord( $c );
 			switch ($o) {
+				case 0x0131 { $c = 'i' }
+				case 0x0142 { $c = 'l' }
+				case 0x0144 { $c = 'n' }
+				case 0x014d { $c = 'o' }
 				case 0x03b2 { $c = chr(0xdf) }
 				case 0x03bc { $c = chr(0xb5) }
-				case 0x0131 { $c = 'i' }
-				case 0x014d { $c = 'o' }
 				case 0x2010 { $c = '-' }
 				case 0x2011 { $c = '-' }
 				case 0x2012 { $c = '-' }
@@ -301,11 +303,12 @@ sub trim {
 				case 0x201d { $c = "\\\"" }
 				case 0x2033 { $c = "\\\"" }
 				case 0x2026 { $c = "..." }
+				case 0x2032 { $c = "\'" }
 				case 0x2039 { $c = "<" }
 				case 0x203a { $c = ">" }
 				case 0x266f { $c = '#' }
 				elsif ($o > 0xff) {
-					msg("unknown unicode $o", $deb_lms);
+					msg(sprintf("unknown unicode 0x%04x", $o), $deb_lms);
 					$c = chr(0xff);
 				}
 			}
