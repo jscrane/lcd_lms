@@ -498,9 +498,6 @@ sub playlist {
 	case "addtracks"	{ lms_send "playlist tracks ?"; }
 	case "load_done"	{ lms_send "playlist tracks ?"; }
 	case "delete"		{ lms_send "playlist tracks ?"; lms_send "playlist index ?"; }
-	case "open"		{
-		lms_send "duration ?";
-	}
 	case "newsong"		{
 		shift;
 		my $id = shift;
@@ -508,7 +505,6 @@ sub playlist {
 			if ($playing && $id == $current_track_id) {
 				return;
 			}
-			lms_send "duration ?";
 			lms_send "album ?";
 			set_progress $id, $total_tracks;
 		} else {
@@ -517,6 +513,7 @@ sub playlist {
 		set_playing 1;
 		lms_send "title ?";
 		lms_send "artist ?";
+		lms_send "duration ?";
 	}
 	else { msg( "playlist: $cmd", $deb_lms ); }
 	}
