@@ -160,8 +160,8 @@ debug "lms > $ans", $deb_lms;
 
 lms_send "mixer volume ?";
 lms_send "mode ?";
-lms_send "time ?";
 lms_send "duration ?";
+lms_send "time ?";
 lms_send "playlist index ?";
 lms_send "title ?";
 lms_send "album ?";
@@ -359,25 +359,25 @@ sub two_lines {
 	my $l2 = shift;
 
 	lcd_send_receive "widget_set $PLAYER album 1 2 $width 2 h 3 \"\"";
-	if (length($l1) >= $width && length($l2) >= $width) {
+	if (length($l1) > $width && length($l2) > $width) {
 		my $s = multiline("$l1 $l2");
 		lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 h 3 \"\"";
 		lcd_send_receive "widget_set $PLAYER title 1 1 $width 3 v 8 \"$s\"";
 		return 1;
 	}
-	if (length($l1) >= $width && length($l2) == 0) {
+	if (length($l1) > $width && length($l2) == 0) {
 		my $t = multiline($l1);
 		lcd_send_receive "widget_set $PLAYER title 1 1 $width 3 v 8 \"$t\"";
 		return 1;
 	}
-	if (length($l1) >= $width) {
+	if (length($l1) > $width) {
 		my $t = multiline($l1);
 		lcd_send_receive "widget_set $PLAYER title 1 1 $width 2 v 8 \"$t\"";
 		my $a = centre($width, $l2);
 		lcd_send_receive "widget_set $PLAYER artist 1 3 $width 3 h 3 \"$a\"";
 		return 1;
 	}
-	if (length($l2) >= $width) {
+	if (length($l2) > $width) {
 		my $t = centre($width, $l1);
 		lcd_send_receive "widget_set $PLAYER title 1 1 $width 1 h 3 \"$t\"";
 		my $a = multiline($l2);
@@ -394,7 +394,7 @@ sub set_artist {
 	if (length($title) == 0 && two_lines($album, $artist)) {
 		return;
 	}
-	if (length($album) == 0 && two_lines($title, $artist)) {
+	if (two_lines($title, $artist)) {
 		return;
 	}
 	if (length($artist) == 0 && two_lines($title, $album)) {
