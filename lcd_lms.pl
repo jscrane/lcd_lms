@@ -287,6 +287,7 @@ sub trim {
 		foreach my $c (split //, decode( "utf8", $s )) {
 			my $o = ord( $c );
 			switch ($o) {
+				case 0x0103 { $c = 'a' }
 				case 0x0131 { $c = 'i' }
 				case 0x0142 { $c = 'l' }
 				case 0x0144 { $c = 'n' }
